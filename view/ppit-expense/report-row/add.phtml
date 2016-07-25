@@ -1,0 +1,59 @@
+<?php
+	$title = $this->translate('Expense reports', 'ppit-expense', $context->getLocale());
+	echo $this->partial('/partials/menu');
+?>
+<?php
+$this->headTitle($title);
+?>
+<div class="row">
+	<div class="col-md-4 col-md-offset-4">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('Expense report', 'ppit-expense', $context->getLocale());?></strong>
+            </div>
+           	<div class="panel-body">
+
+<!-- Form opening tag -->
+				<form action="<?php echo $this->url('reportRow/add') ?>" method="post" name="reportRow" class="form-horizontal" enctype="multipart/form-data" id="reportRow">
+
+<!--  Error -->
+<?php if ($error == 'Size') : ?>
+					<div class="form-group">
+						<div class="col-sm-12"><p class="help-block"><?php echo sprintf($this->translate('The file should not have a size greater than %s Kb', 'ppit-core', $context->getLocale()), $config['ppitCoreSettings']['maxUploadSize']/1000) ?></p></div>
+					</div>
+<?php endif;?>
+
+<!--  CSRF -->
+<?php $element = $csrfForm->get('csrf') ?>
+				    <div class="form-group">
+						<?php echo $this->formElement($element) ?>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+					</div>
+
+<!-- Name -->
+					<div class="col-sm-12">&nbsp;</div>
+				    <div class="form-group">
+						<div class="col-sm-1">
+							<span class="glyphicon glyphicon-comment" title="<?php echo $this->translate('Authorized files: gif, jpeg, png, pdf', 'ppit-expense', $context->getLocale()) ?>"></span>
+						</div>
+				    	<div class="col-sm-10">
+							<input type="file" name="name" id="name" class="form-control"/>
+						</div>
+					</div>
+
+<!-- Submit button -->
+				    <div class="form-group">
+						<div class="col-sm-5">&nbsp;</div>
+				    	<div class="col-sm-7">
+							<input name="submit" type="submit" id="submit" class="btn btn-primary" value="<?php echo $this->translate('Add', 'ppit-core', $context->getLocale()) ?>">
+							&nbsp;&nbsp;
+							<a href="<?php echo $this->url('reportRow') ?>"><?php echo $this->translate('Cancel', 'ppit-core', $context->getLocale()) ?></a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

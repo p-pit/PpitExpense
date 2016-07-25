@@ -1,0 +1,327 @@
+<?php
+	$title = $this->translate('Expense reports', 'ppit-expense', $context->getLocale());
+	echo $this->partial('/partials/menu');
+?>
+<?php
+$this->headTitle($title);
+?>
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate($this->translate('Update an expense report', 'ppit-expense', $context->getLocale()));?></strong>
+            </div>
+           	<div class="panel-body">
+
+				<table class="table-condensed">
+           	           	
+<!-- Agent -->
+				    <tr>
+						<td align="right"><strong><?php echo $this->translate('Agent', 'ppit-core', $context->getLocale()) ?></strong></td>
+						<td><?php echo $reportRow->agent_n_fn ?></td>
+					</tr>
+
+<!-- Document name -->
+				    <tr>
+						<td align="right"><strong><?php echo $this->translate('Documentary evidence', 'ppit-expense', $context->getLocale()) ?></strong></td>
+						<td><a href="<?php echo $this->url('link/download', array('id' => $reportRow->document_id));?>"><?php echo $reportRow->document_name ?></a></td>
+					</tr>
+
+				</table>
+				
+<!-- Form opening tag -->
+				<form action="<?php echo $this->url('reportRow/update', array('id' => $id)) ?>" method="post" name="reportRow" class="form-horizontal" enctype="form-data" id="reportRow" onSubmit="return checkForm()">
+
+<!--  Isolation error -->
+				    <div class="form-group">
+						<input type="hidden" name="db_expense_date" value="<?php echo $reportRow->expense_date ?>">
+						<input type="hidden" name="db_category" value="<?php echo $reportRow->category ?>">
+						<input type="hidden" name="db_including_vat_amount" value="<?php echo $reportRow->including_vat_amount ?>">
+<?php if ($error == 'Isolation') : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The database has evolved in the meantime, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+					</div>
+				
+<!--  CSRF -->
+<?php $element = $csrfForm->get('csrf') ?>
+				    <div class="form-group">
+						<?php echo $this->formElement($element) ?>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+					</div>
+
+<!-- Expense date -->
+				    <div class="form-group" id="input_expense_date_group">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Expense date', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input id="input_expense_date" class="form-control" value="<?php echo $context->decodeDate($reportRow->expense_date) ?>">
+							<input type="hidden" name="expense_date" id="expense_date">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="input_expense_date_error"></p></div>
+					</div>
+
+<!-- Category -->
+				    <div class="form-group" id="category_group">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Category', 'ppit-core', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<select name="category" id="category" class="form-control" value="<?php echo $reportRow->category ?>" onchange="categorySelected()">
+								<option value=""><-- <?php echo $this->translate('Please choose', 'ppit-core', $context->getLocale()) ?> --></option>
+<?php foreach ($config['categories'] as $id => $caption) : ?>
+								<option value="<?php echo $id ?>" <?php if ($id == $reportRow->category) echo 'selected="selected"'; ?>><?php echo $this->translate($caption, 'ppit-expense', $context->getLocale()) ?></option>
+<?php endforeach;?>
+							</select>
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="category_error"></p></div>
+					</div>
+
+<!-- Destination -->
+				    <div class="form-group" id="destination_group"<?php if ($reportRow->category != 'Transport') echo ' style="display: none"' ?>>
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Destination', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input name="destination" id="destination" class="form-control" value="<?php echo $reportRow->destination ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="destination_error"></p></div>
+					</div>
+					
+<!-- Justification -->
+				    <div class="form-group" id="justification_group">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Justification', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input name="justification" id="justification" class="form-control" value="<?php echo $reportRow->justification ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="justification_error"></p></div>
+					</div>
+
+<!-- Including VAT amount -->
+				    <div class="form-group" id="input_including_vat_amount_group">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Incl. tax amount', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input name="input_including_vat_amount" id="input_including_vat_amount" class="form-control" value="<?php echo $reportRow->including_vat_amount ?>">
+							<input type="hidden" name="including_vat_amount" id="including_vat_amount">
+							</div>
+						<div class="col-sm-12"><p class="help-block" id="input_including_vat_amount_error"></p></div>
+					</div>
+
+<!--  Exempted amount -->
+<?php //$exempted_amount = $context->formatFloat($reportRow->including_vat_amount - $reportRow->amount_vat_1 - $reportRow->amount_vat_2, 2);?>
+<!--					<div class="form-group" id="input_exempted_amount_group">
+						<label class="col-sm-5 control-label"><?php //echo $this->translate('Including exempted', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input name="input_exempted_amount" id="input_exempted_amount" class="form-control" value="<?php //echo $exempted_amount ?>">
+							<input type="hidden" name="exempted_amount" id="exempted_amount">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="input_exempted_amount_error"></p></div>
+					</div> --
+					
+<!-- Tax amount -->
+<?php //$i = 0; foreach ($config['vatRates'] as $rate => $caption) : ?>					
+	<?php //$i++; ?>
+				    <div class="form-group" id="input_amount_<?php //echo $i ?>_group">
+						<label class="col-sm-5 control-label"><?php echo $this->translate('Including VAT', 'ppit-expense', $context->getLocale()) ?> <?php //echo $this->translate($caption, 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input name="input_amount_<?php //echo $i ?>" id="input_amount_<?php //echo $i ?>" class="form-control" value="<?php echo /*($i == 1) ? */$reportRow->amount_vat_1 /*: $reportRow->amount_vat_2*/ ?>">
+							<input type="hidden" name="amount_<?php //echo $i ?>" id="amount_<?php //echo $i ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="input_amount_<?php //echo $i ?>_error"></p></div>
+					</div>
+<?php //endforeach;?>
+
+<!-- Audit -->
+<?php if ($reportRow->audit) : ?>
+				<div class="row">
+					<div class="col-md-5"><strong><?php echo $this->translate('Historical', 'ppit-expense', $context->getLocale()) ?></strong></div>
+					<div class="col-md-7">&nbsp;</div>
+				</div>
+				<div class="panel panel-default">
+			       	<div class="panel-body">
+	<?php foreach ($reportRow->audit as $comment) : ?>
+						<div class="row">
+							<div class="col-md-12">
+								<strong><?php echo $context->decodeDate($comment->date) ?>:</strong>&nbsp;
+								<?php echo $this->translate($comment->status, 'ppit-expense', $context->getLocale()) ?>&nbsp;
+								(<?php echo $comment->user ?>)
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-2" align="right">&nbsp;</div>
+							<div class="col-md-10">
+								<em><?php echo $comment->comment ?></em></div>
+						</div>
+	<?php endforeach;?>
+					</div>
+				</div>
+<?php endif;?>
+				
+<!-- Comment -->
+					<div class="form-group" id="comment_group">
+						<label class="col-sm-5 control-label"><?php echo $this->translate('Comment', 'ppit-core', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<textarea name="comment" rows="3" cols="100" id="comment" class="form-control"></textarea>
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="comment_error"></p></div>
+					</div>
+					
+<!-- Submit button -->
+				    <div class="form-group">
+						<div class="col-sm-5">&nbsp;</div>
+						<div class="col-sm-7">
+							<input name="submit" type="submit" id="submitbutton" class="btn btn-primary" value="<?php echo (($reportRow->status == 'Submitted') ? $this->translate('Correct', 'ppit-expense', $context->getLocale()) :  $this->translate('Submit', 'ppit-core', $context->getLocale())) ?>">
+							&nbsp;&nbsp;
+							<a href="<?php echo $this->url('reportRow') ?>"><?php echo $this->translate('Cancel', 'ppit-core', $context->getLocale()) ?></a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+
+<script>
+
+function categorySelected() {
+	if (document.getElementById("category").value == "Transport") {
+		document.getElementById("destination_group").style.display = "inherit";
+	}
+	else {
+		document.getElementById("destination_group").style.display = "none";
+	}
+}
+
+// Set datepicker on expense date
+	jQuery(document).ready(function($){
+	    $("#input_expense_date").datepicker();
+	});
+
+// The elements are checked last to first so the focus is positionned on the first element on error
+function checkForm() 
+{
+	var validity = true;	
+	
+	// comment
+	if (document.getElementById("comment").value.length > 255) {
+		renderElement("comment", "<?php echo $this->translate('The comment is too long', 'ppit-expense', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("comment", null);
+	}
+	
+	// amounts
+	var includingVatAmount, sum = 0;
+	var number, amountValidity = true, error;
+<?php //$i = 0; foreach ($config['vatRates'] as $rate => $caption) : ?>
+	<?php //$i++; ?>
+	number = document.getElementById("input_amount_<?php //echo $i ?>").value;
+	error = checkNumber(number, 0, 999999);
+	if (error) {
+		renderElement("input_amount_<?php //echo $i ?>", error);
+		validity = amountValidity = false;
+	}
+	else { 
+		renderElement("input_amount_<?php //echo $i ?>", null);
+		number = getNumber(number, 2);
+		document.getElementById("amount_<?php //echo $i ?>").value = number;
+		sum += number;
+}
+<?php //endforeach;?>	
+/*
+	number = document.getElementById("input_exempted_amount").value;
+	error = checkNumber(number, 0, 999999);
+	if (error) {
+		renderElement("input_exempted_amount", error);
+		validity = amountValidity = false;
+	}
+	else { 
+		renderElement("input_exempted_amount", null);
+		number = getNumber(number, 2);
+		document.getElementById("exempted_amount").value = number;
+		sum += number;
+	}*/
+
+	number = document.getElementById("input_including_vat_amount").value;
+	error = checkNumber(number, 0.01, 999999);
+	if (error) {
+		renderElement("input_including_vat_amount", error);
+		validity = amountValidity = false;
+	}
+    else { 
+		renderElement("input_including_vat_amount", null);
+		includingVatAmount = getNumber(number, 2);
+		document.getElementById("including_vat_amount").value = includingVatAmount;
+	}
+/*	
+	if (amountValidity) {
+		if (includingVatAmount != sum)
+		{
+<?php //$i = 0; foreach ($config['vatRates'] as $rate => $caption) : ?>
+	<?php //$i++; ?>
+			renderElement("input_amount_<?php //echo $i ?>", "<?php //echo $this->translate('The sum should be equal to', 'ppit-expense', $context->getLocale()) ?> " + document.getElementById("input_including_vat_amount").value);
+<?php //endforeach;?>	
+			renderElement("input_exempted_amount", "<?php //echo $this->translate('The sum should be equal to', 'ppit-expense', $context->getLocale()); ?> " + document.getElementById("input_including_vat_amount").value);
+			validity = false;
+		}
+	    else { 
+<?php //$i = 0; foreach ($config['vatRates'] as $rate => $caption) : ?>
+	<?php //$i++; ?>
+	    renderElement("input_amount_<?php //echo $i ?>", null);
+<?php //endforeach;?>	
+	    renderElement("input_exempted_amount", null);
+	    }
+	}*/
+	
+	// Justification
+	if (document.getElementById("justification").value == "") {
+		renderElement("justification", "<?php echo $this->translate('Please input a value', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("justification", null);
+	}
+	
+	// Destination
+	if ((document.getElementById("category").value == "Transport" || document.getElementById("category").value == "Mileage allowance") && document.getElementById("destination").value == "") {
+		renderElement("destination", "<?php echo $this->translate('Please input a value', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("destination", null);
+	}
+	
+	// category
+	if (document.getElementById("category").value == "") {
+		renderElement("category", "<?php echo $this->translate('A value should be selected', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("category", null);
+	}
+	
+	// expense_date
+    var date = document.getElementById('input_expense_date').value;
+	error = checkDate(date);
+	if (error) {
+		renderElement("input_expense_date", error);
+		validity = false;
+	}
+    else {
+
+<?php $minDate = (date('m') == '01') ? (date('Y') - 1).'-'.date('01').'-'.'01' : date('Y').'-'.date('01').'-'.'01'; ?>
+		date = encodeDate(date);
+		if (date < "<?php echo $minDate ?>") {
+			renderElement("input_expense_date", "<?php echo $this->translate('The date should not be less than', 'ppit-expense', $context->getLocale()) ?> <?php echo $context->decodeDate($minDate) ?>");
+			validity = false;
+		}
+		else {
+			renderElement("input_expense_date", null);
+			document.getElementById('expense_date').value = date;
+		}
+    }
+
+	return validity;
+}
+
+</script>

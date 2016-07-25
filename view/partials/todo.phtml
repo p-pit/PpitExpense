@@ -1,0 +1,113 @@
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('Expense reports to be approved', 'ppit-expense', $context->getLocale()) ?></strong>
+            </div>
+           	<div class="panel-body">
+
+<!-- Header -->
+				<table class="table-condensed">
+					<tr>
+						<td colspan="2">
+							<a href="<?php echo $this->url('reportRow/index');?>"><?php echo $this->translate('My expense reports', 'ppit-expense', $context->getLocale()) ?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+							<a href="<?php echo $this->url('approbation/index');?>?mode=total"><?php echo $this->translate('All the reports', 'ppit-expense', $context->getLocale()) ?></a>
+						</td>
+					</tr>
+					<tr><td colspan="2">&nbsp;</td></tr>
+					<tr>
+						<td align="right"><strong><?php echo $this->translate('Approver', 'ppit-user', $context->getLocale()) ?></strong></td>
+						<td><?php echo $header['approver'] ?></td>
+					</tr>
+					<tr>
+						<td align="right"><strong><?php echo $this->translate('To be approved', 'ppit-expense', $context->getLocale()).' ('.$currentUser->currency_symbol.' '.$this->translate('incl. tax', 'ppit-expense', $context->getLocale()).')' ?></strong></td>
+						<td><?php echo $currentUser->formatFloat($header['including_vat_sum'], 2) ?> </td>
+					</tr>
+					<tr><td colspan="2">&nbsp;</td></tr>
+				</table>
+
+				<form action="<?php echo $this->url('approbation/index') ?>" method="post" name="report_row_todo" class="form-horizontal">
+				
+<!-- Global message -->
+<?php if ($message == 'OK') : ?>
+					<div class="form-group">
+						<div class="col-sm-12"><p><?php echo $this->translate('Your request have been registered', 'ppit-core', $context->getLocale()) ?></p></div>
+					</div>
+<?php endif;?>
+
+<!-- Rows -->
+					<table class="table table-striped">
+						<tr class="<?php echo $this->cycle(array("even", "odd"))->next();?>">
+							<td colspan="4">&nbsp;</td>
+							<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+																?major=owner_id
+																<?php if ($major == 'owner_id' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+								<?php echo $this->translate('Agent', 'ppit-core', $context->getLocale());?></strong></td>
+							<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+																?major=expense_date
+																<?php if ($major == 'expense_date' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+								<?php echo $this->translate('Period', 'ppit-expense', $context->getLocale());?></strong></td>
+							<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+																?major=category
+																<?php if ($major == 'category' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+								<?php echo $this->translate('Category', 'ppit-core', $context->getLocale());?></strong></td>
+							<td>&nbsp;</td>
+							<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+																?major=capped_amount
+																<?php if ($major == 'capped_amount' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+								<?php echo $this->translate('Ceiling', 'ppit-expense', $context->getLocale());?></strong></td>
+						</tr>
+<?php foreach ($reportRows as $reportRow) : ?>
+<?php
+	if ($reportRow->status == 'Rejected') $style = 'style="color: red"';
+	elseif ($reportRow->status == 'Approved') $style = 'style="color: orange"';
+	elseif ($reportRow->status == 'Registered') $style = 'style="color: green"';
+	else $style = '';
+?>
+							<td><input type="checkbox" name="row<?php echo $reportRow->id ?>" id="row<?php echo $reportRow->id ?>" value="1"></td>
+							<td><a class="glyphicon glyphicon-zoom-in" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale()) ?>" href="<?php echo $this->url('reportRow/detail', array('id' => $reportRow->id));?>?ctrl=approbation/index"></a></td>
+<?php if ($reportRow->category == 'Mileage allowance') : ?>
+							<td>&nbsp;</td>
+<?php else : ?>
+							<td><a class="glyphicon glyphicon-download-alt" title="<?php echo $this->translate('Proof', 'ppit-expense', $context->getLocale()) ?>" href="<?php echo $this->url('link/download', array('id' => $reportRow->document_id));?>"></a></td>
+<?php endif;?>
+							<td><a href="<?php echo $this->url('approbation/approbe', array('id' => $reportRow->id));?>"><?php echo $this->translate('Approve / Reject', 'ppit-expense', $context->getLocale()) ?></a></td>
+							<td align="left"><?php echo $reportRow->agent_n_fn ?></td>
+							<td align="center"><?php echo $this->translate($reportRow->period_caption, 'ppit-core', $context->getLocale()) ?><?php //echo substr($reportRow->expense_date, 8, 2).'/'.substr($reportRow->expense_date, 5, 2) ?></td>
+							<td align="center"><?php echo $this->translate($reportRow->category, 'ppit-expense', $context->getLocale()) ?></td>
+<?php if ($reportRow->category == 'Mileage allowance') : ?>
+							<td <?php echo $style ?> align="right"><?php echo $currentUser->formatFloat($reportRow->quantity, 0, $currentUser) ?> <?php echo $this->translate('miles', 'ppit-expense', $context->getLocale()) ?></td>
+<?php else : ?>
+							<td <?php echo $style ?> align="right"><?php echo $currentUser->formatFloat($reportRow->including_vat_amount, 2, $currentUser) ?>&nbsp;<?php echo $currentUser->currency_symbol ?></td>
+<?php endif;?>
+							<td <?php echo $style ?> align="right"><strong><?php echo $currentUser->formatFloat($reportRow->capped_amount, 2, $currentUser) ?>&nbsp;<?php echo $currentUser->currency_symbol ?></strong></td>
+						</tr>
+<?php endforeach; ?>
+						<tr>
+							<td><input type="checkbox" name="check_all" id="check_all" onchange="checkAll();" value="1"></td>
+							<td colspan="3"><?php echo $this->translate('Check all', 'ppit-core', $context->getLocale()) ?></td>
+							<td colspan="5">
+								<input name="approve" type="submit" id="batch_approbation" class="btn btn-primary" value="<?php echo $this->translate('Batch approbation', 'ppit-expense', $context->getLocale()) ?>" value="Approbation">
+								<input name="reject" type="submit" id="batch_reject" class="btn btn-primary" value="<?php echo $this->translate('Batch reject', 'ppit-expense', $context->getLocale()) ?>" value="Reject">
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>
+							<td colspan="3" align="right"><?php echo $this->translate('Comment', 'ppit-core', $context->getLocale()) ?></td>
+							<td colspan="5"><textarea name="comment" rows="3" id="comment" class="form-control"></textarea></td>
+						</tr>
+					</table>
+				</form>
+			</div>
+		</div>
+
+<script>
+function checkAll() {
+<?php foreach ($reportRows as $reportRow) :?>
+	if (document.getElementById("check_all").checked) {
+		document.getElementById("row<?php echo $reportRow->id ?>").checked = true;
+	}
+	else {
+		document.getElementById("row<?php echo $reportRow->id ?>").checked = false;
+	}
+<?php endforeach;?>
+}
+</script>

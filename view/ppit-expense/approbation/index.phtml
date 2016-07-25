@@ -1,0 +1,86 @@
+<?php
+	echo $this->partial('/partials/menu');
+    $title = $this->translate('Expense reports', 'ppit-expense', $context->getLocale());
+	$this->headTitle($title);
+?>
+<div class="row">
+    <div class="col-md-6">
+<?php if ($mode == 'total') : ?>
+<?php
+	echo $this->partial('/partials/approbation-total', array(
+    		'context' => $context,
+    		'periods' => $periods,
+			'major' => $major,
+    		'dir' => $dir,
+    		'reportRows' => $reportRows,
+    		'header' => $header,
+			'currency' => $currency,
+    ));
+?>
+<?php else : ?>
+<?php
+	echo $this->partial('/partials/todo', array(
+    		'context' => $context,
+    		'major' => $major,
+    		'dir' => $dir,
+    		'reportRows' => $reportRows,
+    		'header' => $header,
+    		'message' => $message,
+    ));
+?>
+<?php endif;?>
+    </div>
+
+    <div class="col-md-6">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('My budget', 'ppit-expense', $context->getLocale()) ?></strong>
+            </div>
+           	<div class="panel-body">
+	 			<table class="table-condensed">
+					<tr>
+						<td align="center">
+							<select id="period">
+<?php foreach ($periods as $period) : ?>
+								<option value="<?php echo $period['period'] ?>" <?php if (date('Y-m') == $period['period']) echo 'selected="selected"'; ?>><?php echo $period['period'] ?></option>
+<?php endforeach;?>
+							</select>
+						</td>
+						<td align="center">
+							<strong><?php echo $this->translate('Budget', 'ppit-expense', $context->getLocale()) ?></strong> 
+						</td>
+						<td class="col-md-4" align="center">
+							<strong><?php echo $this->translate('Spent', 'ppit-expense', $context->getLocale()) ?></strong> 
+						</td>
+					</tr>
+	<?php foreach ($periods as $period) : ?>
+					<tr class="report_rows">
+						<td class="col-md-4" align="center">
+							<strong><?php echo $period['period'] ?></strong> 
+						</td>
+						<td class="col-md-4" align="right">
+							<?php echo $context->formatFloat($period['expected'], 2) ?> <?php echo $currency.' '.$this->translate('incl. tax', 'ppit-expense', $context->getLocale()) ?>
+						</td>
+						<td class="col-md-4" align="right">
+								<?php echo $context->formatFloat($period['achieved'], 2) ?> <?php echo $currency.' '.$this->translate('incl. tax', 'ppit-expense', $context->getLocale()) ?>
+						</td>
+					</tr>
+	<?php endforeach;?>
+				</table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+	$(".report_rows").hide();
+	$(".report_rows:contains('<?php echo date('Y-m') ?>')").show();
+	
+	//Recherche basée sur le champ select "period"
+	$("#period").bind("change", function(){
+		var strToSearch = $("#period").val();
+		$(".report_rows").hide();
+		$(".report_rows:contains('"+strToSearch+"')").show();
+	});
+</script>

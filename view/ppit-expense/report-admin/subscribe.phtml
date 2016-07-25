@@ -1,0 +1,330 @@
+<?php
+	$title = $this->translate('Expense reports', 'ppit-expense', $context->getLocale());
+//	echo $this->partial('/partials/menu');
+?>
+<div>
+    <a target="_blank" href="https://www.p-pit.fr"><img width="300" src="<?php echo $this->basePath('images/ppit-300-baseline.png') ?>" width="300" alt="<?php $this->translate('CIT Logo') ?>"></a>
+</div>
+<div>&nbsp;</div>
+<?php $this->headTitle($title); ?>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate($this->translate('Subscribe to P-PIT expense reports', 'ppit-expense', $context->getLocale()));?></strong>
+            </div>
+           	<div class="panel-body">
+				
+<!-- Form opening tag -->
+				<form action="<?php echo $this->url('reportAdmin/subscribe') ?>" method="post" name="reportRow" class="form-horizontal" enctype="form-data" id="reportRow" onSubmit="return checkForm()">
+				
+<!--  CSRF -->
+<?php $element = $csrfForm->get('csrf') ?>
+				    <div class="form-group">
+						<?php echo $this->formElement($element) ?>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+					</div>
+
+<!--  Duplicate error -->
+<?php if ($error == 'Duplicate contact') : ?>
+				    <div class="form-group">
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('A contact with the same email or cellular phone number already exists', 'ppit-contact', $context->getLocale()) ?></p></div>
+					</div>
+<?php endif;?>
+<?php if ($error == 'Duplicate user') : ?>
+				    <div class="form-group">
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('A user with the same identifier already exists, please choose another one', 'ppit-user', $context->getLocale()) ?></p></div>
+					</div>
+<?php endif;?>
+<p>Ayez un accès immédiat à <em>P-PIT Notes de frais</em> en saisissant ces quelques champs et en soumettant ce formulaire.</p>
+<p>Vous recevrez ensuite un email (cela peut prendre quelques minutes) vous demandant de saisir votre mot de passe initial, vous vous identifiez et c'est parti.
+Vous disposez de droits d'admin vous permettant d'utiliser toutes les fonctions et de créer des utilisateurs selon les 3 rôles disponibles : agents, valideurs et comptables.</p>
+
+<p>Cette version d'essai est disponible gratuitement pendant 1 mois.
+A l'issue de cette période, si vous choisissez de souscrire à une des offres de la gamme <em>P-PIT Notes de frais</em>,
+vous aurez la possibilité de personnaliser l'application au logo et couleurs de votre entreprise,
+et bien-sûr vous conserverez toutes les données saisies lors de votre phase d'essai.</p>
+
+<!-- Instance caption -->
+				    <div class="form-group" id="instance_caption_group">
+						<label class="col-sm-4 control-label">* <?php echo $this->translate('Organization name', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="instance_caption" id="instance_caption" class="form-control" value="<?php echo $instance->caption ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="instance_caption_error"></p></div>
+					</div>
+
+<!-- Title -->
+				    <div class="form-group" id="n_title_group">
+						<label class="col-sm-4 control-label"><?php echo $this->translate('Title', 'ppit-contact', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="n_title" id="n_title" class="form-control" value="<?php echo $vcard->n_title ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="n_title_error"></p></div>
+					</div>
+					
+<!-- First name -->
+				    <div class="form-group" id="n_first_group">
+						<label class="col-sm-4 control-label">* <?php echo $this->translate('First name', 'ppit-contact', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="n_first" id="n_first" class="form-control" value="<?php echo $vcard->n_first ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="n_first_error"></p></div>
+					</div>
+
+<!-- Last name -->
+				    <div class="form-group" id="n_last_group">
+						<label class="col-sm-4 control-label">* <?php echo $this->translate('Last name', 'ppit-contact', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="n_last" id="n_last" class="form-control" value="<?php echo $vcard->n_last ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="n_last_error"></p></div>
+					</div>
+					
+<!-- Email -->
+				    <div class="form-group" id="email_group">
+						<label class="col-sm-4 control-label">* <?php echo $this->translate('Email', 'ppit-contact', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="email" id="email" class="form-control" value="<?php echo $vcard->email ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="email_error"></p></div>
+					</div>
+
+<!-- Work phone -->
+				    <div class="form-group" id="tel_work_group">
+						<label class="col-sm-4 control-label"> <?php echo $this->translate('Work phone', 'ppit-contact', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="tel_work" id="tel_work" class="form-control" value="<?php echo $vcard->tel_work ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="tel_work_error"></p></div>
+					</div>
+
+<!-- Cellular phone -->
+				    <div class="form-group" id="tel_cell_group">
+						<label class="col-sm-4 control-label"> <?php echo $this->translate('Cellular phone', 'ppit-contact', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="tel_cell" id="tel_cell" class="form-control" value="<?php echo $vcard->tel_cell ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="tel_cell_error"></p></div>
+					</div>
+					
+<!-- User name -->
+				    <div class="form-group" id="username_group">
+						<label class="col-sm-4 control-label">* <?php echo $this->translate('Please choose your identifier', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="username" id="username" class="form-control" value="<?php echo $user->username ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="username_error"></p></div>
+					</div>
+					
+<!-- Locale -->
+					<input type="hidden" name="locale" value="fr_FR">
+										
+<!-- Organizational unit identifier -->
+				    <div class="form-group" id="identifier_group">
+						<label class="col-sm-4 control-label"><?php echo $this->translate('Your entity identifier', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="identifier" id="identifier" class="form-control" value="<?php echo $orgUnit->identifier ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="identifier_error"></p></div>
+					</div>
+
+<!-- Organizational unit caption -->
+				    <div class="form-group" id="org_unit_caption_group">
+						<label class="col-sm-4 control-label"><?php echo $this->translate('Your entity name', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="org_unit_caption" id="org_unit_caption" class="form-control" value="<?php echo $orgUnit->caption ?>">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="org_unit_caption_error"></p></div>
+					</div>
+	
+<!-- Monthly budget -->
+				    <div class="form-group" id="input_monthly_budget_group">
+						<label class="col-sm-4 control-label">* <?php echo $this->translate('Monthly budget', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-8">
+							<input name="input_monthly_budget" id="input_monthly_budget" class="form-control" value="<?php echo $context->formatFloat($event->expected_value, 2) ?>">
+							<input type="hidden" name="monthly_budget" id="monthly_budget">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="input_monthly_budget_error"></p></div>
+					</div>
+
+<p>Veuillez noter que cette version d'essai vous est proposée à titre gracieux, sans garantie de disponibilité de l'application ni des données.
+Nous vous invitons à consulter les conditions de service associées à chaque formule de notre gamme commerciale.</p>
+<p>En cliquant sur <em>Soumettre</em>, vous acceptez les présentes conditions d'utilisation.</p>
+<!-- Submit button -->
+				    <div class="form-group">
+						<div class="col-sm-4">&nbsp;</div>
+						<div class="col-sm-8">
+							<input name="submit" type="submit" id="submitbutton" class="btn btn-primary" value="<?php echo $this->translate('Submit', 'ppit-core', $context->getLocale()) ?>">
+							&nbsp;&nbsp;
+							<a href="<?php echo $this->url('reportRow') ?>"><?php echo $this->translate('Cancel', 'ppit-core', $context->getLocale()) ?></a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+
+<script>
+
+// The elements are checked last to first so the focus is positionned on the first element on error
+function checkForm() 
+{
+	var validity = true;	
+
+	var number = document.getElementById("input_monthly_budget").value;
+	error = checkNumber(number, 0, 999999);
+	if (error) {
+		renderElement("input_monthly_budget", error);
+		validity = amountValidity = false;
+	}
+	else { 
+		renderElement("input_monthly_budget", null);
+		number = getNumber(number, 0);
+		document.getElementById("monthly_budget").value = number;
+	}
+	
+	// Organizational unit caption
+	if (document.getElementById("org_unit_caption").value.length > 255) {
+		renderElement("org_unit_caption", "<?php echo $this->translate('The input is too long', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("org_unit_caption", null);
+	}
+	
+	// Organizational unit identifier
+	if (document.getElementById("identifier").value.length > 255) {
+		renderElement("identifier", "<?php echo $this->translate('The input is too long', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("identifier", null);
+	}
+	
+	// User name
+	if (document.getElementById("username").value == "") {
+		renderElement("username", "<?php echo $this->translate('Please input an identifier', 'ppit-user', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else if (document.getElementById("username").value.length > 255) {
+		renderElement("username", "<?php echo $this->translate('The input is too long', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("username", null);
+	}
+	
+	var error;
+	
+	// Cellular phone
+	var tel_cell_validity = true;
+	error = checkPhone(document.getElementById('tel_cell').value);
+	if (error) {
+		renderElement("tel_cell", error);
+		validity = tel_cell_validity = false;
+	}
+	    else {
+		renderElement("tel_cell", null);
+	}
+	
+	// Work phone
+	var tel_work_validity = true;
+	error = checkPhone(document.getElementById('tel_work').value);
+	if (error) {
+		renderElement("tel_work", error);
+		validity = tel_work_validity = false;
+	}
+	else {
+		renderElement("tel_work", null);
+	}
+
+	// 1 mandatory phone
+	if (tel_cell_validity && tel_work_validity) {
+		if (document.getElementById("tel_work").value == "" && document.getElementById("tel_cell").value == "") {
+			renderElement("tel_cell", "<?php echo $this->translate('Please input at least one phone', 'ppit-contact', $context->getLocale()) ?>");
+			renderElement("tel_work", "<?php echo $this->translate('Please input at least one phone', 'ppit-contact', $context->getLocale()) ?>");
+			validity = false;
+		}
+	    else {
+			renderElement("tel_cell", null);
+	    	renderElement("tel_work", null);
+		}
+	}
+	
+	// Email
+	var email = document.getElementById('email').value;
+	if (email == "") {
+		renderElement("email", "<?php echo $this->translate('Please input an email', 'ppit-contact', $context->getLocale()) ?>");
+		validity = false;
+	}
+	else {
+		error = checkEmail(email);
+		if (error) {
+			renderElement("email", error);
+			validity = email_validity = false;
+		}
+	    else {
+			renderElement("email", null);
+		}
+	}
+	
+	// Last name
+	if (document.getElementById("n_last").value == "") {
+		renderElement("n_last", "<?php echo $this->translate('Please input the last name', 'ppit-contact', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else if (document.getElementById("n_last").value.length > 255) {
+		renderElement("n_last", "<?php echo $this->translate('The input is too long', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("n_last", null);
+	}
+	
+	// First name
+	if (document.getElementById("n_first").value == "") {
+		renderElement("n_first", "<?php echo $this->translate('Please input the first name', 'ppit-contact', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else if (document.getElementById("n_first").value.length > 255) {
+		renderElement("n_last", "<?php echo $this->translate('The input is too long', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("n_first", null);
+	}
+	
+	// Title
+	if (document.getElementById("n_title").value.length > 255) {
+		renderElement("n_title", "<?php echo $this->translate('The input is too long', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("n_title", null);
+	}
+	
+	// Instance caption
+	if (document.getElementById("instance_caption").value == "") {
+		renderElement("instance_caption", "<?php echo $this->translate('Please input an organization name', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else if (document.getElementById("instance_caption").value.length > 255) {
+		renderElement("n_last", "<?php echo $this->translate('The input is too long', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("instance_caption", null);
+	}
+	
+	return validity;
+}
+
+</script>
+  

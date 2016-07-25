@@ -1,0 +1,151 @@
+<?php
+	$title = $this->translate('Expense reports', 'ppit-expense', $context->getLocale());
+	echo $this->partial('/partials/menu');
+?>
+<?php
+$this->headTitle($title);
+?>
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('Delete an expense report', 'ppit-expense', $context->getLocale()) ?></strong>
+            </div>
+           	<div class="panel-body">
+
+				<table class="table-condensed">
+           	
+<!-- Issuer -->
+			    <tr class="row">
+					<td align="right"><strong><?php echo $this->translate('Issuer', 'ppit-expense', $context->getLocale()) ?></strong></td>
+					<td><?php echo $reportRow->agent_n_fn ?></td>
+				</tr>
+
+<!-- Category -->
+<?php if ($reportRow->category) : ?>
+				<tr class="row">
+					<td align="right"><strong><?php echo $this->translate('Category', 'ppit-core', $context->getLocale()) ?></strong></td>
+					<td><?php echo $this->translate($reportRow->category, 'ppit-expense', $context->getLocale()) ?></td>
+				</tr>
+<?php endif;?>
+
+<!-- Document name -->
+<?php if ($reportRow->document_id) : ?>
+			    <tr class="row">
+					<td align="right"><strong><?php echo $this->translate('Documentary evidence', 'ppit-expense', $context->getLocale()) ?></strong></td>
+					<td><a href="<?php echo $this->url('link/download', array('id' => $reportRow->document_id));?>"><?php echo $reportRow->document_name ?></a></td>
+				</tr>
+<?php endif;?>
+
+<!-- Quantity -->
+<?php if ($reportRow->category == 'Mileage allowance') : ?>
+			    <tr class="row">
+					<td align="right"><strong><?php echo $this->translate('Number of miles', 'ppit-expense', $context->getLocale()) ?></strong></td>
+					<td><?php echo $reportRow->quantity ?></td>
+				</tr>
+<?php endif;?>
+
+<!-- Expense date -->
+			    <tr class="row">
+					<td align="right"><strong><?php echo $this->translate('Expense date', 'ppit-expense', $context->getLocale()) ?></strong></td>
+					<td><?php echo $reportRow->expense_date ?></td>
+				</tr>
+           	
+<!-- Approver -->
+<?php if ($reportRow->approver_id) : ?>
+				<tr class="row">
+					<td align="right"><strong><?php echo $this->translate('Approver', 'ppit-user', $context->getLocale()) ?></strong></td>
+					<td><?php echo $reportRow->approver_n_fn ?></td>
+				</tr>
+<?php endif;?>
+				
+<!-- Approval date -->
+<?php if ($reportRow->approval_date) : ?>
+			    <tr class="row">
+					<td align="right"><strong><?php echo $this->translate('Approved on', 'ppit-expense', $context->getLocale()) ?></strong></td>
+					<td><?php echo $reportRow->approval_date ?></td>
+				</tr>
+<?php endif;?>
+
+<!-- Registration date -->
+<?php if ($reportRow->registration_date) : ?>
+				<tr class="row">
+					<td align="right"><strong><?php echo $this->translate('Registered on', 'ppit-expense', $context->getLocale()) ?></strong></td>
+					<td><?php echo $reportRow->registration_date ?></td>
+				</tr>
+<?php endif;?>
+
+				<tr class="row"><td colspan="2">&nbsp;</td></tr>
+
+<!-- Including VAT amount -->
+				<tr class="row">
+					<td align="right"><strong><?php echo $this->translate('Amount', 'ppit-expense', $context->getLocale()).' ('.$context->getCurrencySymbol().' '.$this->translate('incl. tax', 'ppit-expense', $context->getLocale()).')' ?></strong></td>
+					<td><?php echo $context->formatFloat($reportRow->including_vat_amount, 2) ?></td>
+				</tr>
+
+<!-- Exempted amount -->
+				<tr class="row">
+					<td align="right"><?php echo $this->translate('Including exempted', 'ppit-expense', $context->getLocale()) ?></td>
+					<td><?php echo $context->formatFloat($reportRow->exempted_amount, 2) ?></td>
+				</tr>
+				
+<!-- VAT amount 1 -->
+<?php if ($reportRow->vat_rate_1) : ?>
+				<tr class="row">
+					<td align="right"><?php echo $this->translate('Including VAT', 'ppit-expense', $context->getLocale()) ?> <?php echo $this->translate($config['vatRates'][$reportRow->vat_rate_1], 'ppit-expense', $context->getLocale()) ?></td>
+					<td><?php echo $context->formatFloat($reportRow->amount_vat_1, 2).' ('.$this->translate('VAT', 'ppit-expense', $context->getLocale()).' = '.$context->formatFloat($reportRow->vat_1, 2).')' ?></td>
+				</tr>
+<?php endif;?>
+				
+<!-- VAT amount 2 -->
+<?php if ($reportRow->vat_rate_2) : ?>
+				<tr class="row">
+					<td align="right"><?php echo $this->translate('Including VAT', 'ppit-expense', $context->getLocale()) ?> <?php echo $this->translate($config['vatRates'][$reportRow->vat_rate_2], 'ppit-expense', $context->getLocale()) ?></td>
+					<td><?php echo $context->formatFloat($reportRow->amount_vat_2, 2).' ('.$this->translate('VAT', 'ppit-expense', $context->getLocale()).' = '.$context->formatFloat($reportRow->vat_2, 2).')' ?></td>
+				</tr>
+<?php endif;?>
+				
+<!-- Before VAT amount -->
+			    <tr class="row">
+					<td align="right"><?php echo $this->translate('Before VAT amount', 'ppit-expense', $context->getLocale()) ?></td>
+					<td><?php echo $context->formatFloat($reportRow->before_vat_amount, 2) ?></td>
+				</tr>
+				
+				</table>
+           					
+<!-- Form -->
+				<form action="<?php echo $this->url('reportRow/delete', array('id' => $id)) ?>" method="post">
+
+<!--  Isolation error -->
+				    <div class="form-group">
+						<input type="hidden" name="db_expense_date" value="<?php echo $reportRow->expense_date ?>">
+						<input type="hidden" name="db_category" value="<?php echo $reportRow->category ?>">
+						<input type="hidden" name="db_including_vat_amount" value="<?php echo $reportRow->including_vat_amount ?>">
+<?php if ($error == 'Isolation') : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The database has evolved in the meantime, please confirm the delete', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+					</div>
+				
+<!--  CSRF -->
+<?php $element = $csrfForm->get('expense_update_csrf') ?>
+				    <div class="form-group">
+						<?php echo $this->formElement($element) ?>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+					</div>
+					
+<!-- Submit button -->
+					<div class="form-group">
+						<div class="col-sm-5">&nbsp;</div>
+						<div class="col-sm-7">
+							<input type="submit" class="btn btn-primary" name="del" value="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>" />
+							&nbsp;&nbsp;
+							<a href="<?php echo $this->url('reportRow') ?>"><?php echo $this->translate('Cancel', 'ppit-core', $context->getLocale()) ?></a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

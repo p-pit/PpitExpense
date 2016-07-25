@@ -1,0 +1,122 @@
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('My staff', 'ppit-expense', $context->getLocale()) ?></strong>
+            </div>
+           	<div class="panel-body">
+           	
+<!-- Header -->
+				<table class="table-condensed">
+					<tr>
+						<td colspan="2">
+							<a href="<?php echo $this->url('reportRow/index');?>"><?php echo $this->translate('My expense reports', 'ppit-expense', $context->getLocale()) ?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+							<a href="<?php echo $this->url('approbation/index');?>"><?php echo $this->translate('To be approved', 'ppit-expense', $context->getLocale()) ?></a>
+						</td>
+					</tr>
+
+					<tr><td colspan="2">&nbsp;</td></tr>
+
+<!--  Approver -->
+<?php if ($currentUser->role_id == 'approver') : ?>
+					<tr>
+						<td align="right"><strong><?php echo $this->translate('Approver', 'ppit-user', $context->getLocale()) ?></strong></td>
+						<td><?php echo $header['approver'] ?></td>
+					</tr>
+					<!--  <tr>
+						<td align="right"><strong><?php //echo $this->translate('To be approved', 'ppit-expense', $context->getLocale()).' ('.$currency.' '.$this->translate('incl. tax', 'ppit-expense', $context->getLocale()).')' ?></strong></td>
+						<td><?php //echo $currentUser->formatFloat($header['including_vat_sum'], 2) ?></td>
+					</tr> -->
+
+<!--  Accountant -->
+<?php else : ?>
+					<tr>
+						<td align="right"><strong><?php echo $this->translate('Accountant', 'ppit-user', $context->getLocale()) ?></strong></td>
+						<td><?php echo $header['approver'] ?></td>
+					</tr>
+					<tr>
+						<td align="right"><strong><?php //echo $this->translate('To be registered', 'ppit-expense', $context->getLocale()).' ('.$currency.' '.$this->translate('incl. tax', 'ppit-expense', $context->getLocale()).')' ?></strong></td>
+						<td><?php //echo $currentUser->formatFloat($header['including_vat_sum'], 2) ?></td>
+					</tr>
+
+<?php endif;?>
+
+					<tr><td colspan="2">&nbsp;</td></tr>
+				</table>
+
+<!-- Rows -->
+<table class="table table-striped">
+	<tr>
+		<td>&nbsp;</td>
+		<td colspan="2">
+			<span class="glyphicon glyphicon-search"></span>
+			<input type="search" size="7" id="search" autocomplete="off"/></strong></td>
+		</td>
+		<td><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?mode=total&major=owner_id
+											<?php if ($major == 'owner_id' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $this->translate('Agent', 'ppit-core', $context->getLocale());?></strong></td>
+		<td><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?mode=total&major=expense_date
+											<?php if ($major == 'expense_date' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $this->translate('Date', 'ppit-core', $context->getLocale());?></strong></td>
+		<td><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?mode=total&major=category
+											<?php if ($major == 'category' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $this->translate('Category', 'ppit-core', $context->getLocale());?></strong></td>
+		<td align="right"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?mode=total&major=including_vat_amount
+											<?php if ($major == 'including_vat_amount' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $currentUser->currency_symbol.' '.$this->translate('incl. tax', 'ppit-expense', $context->getLocale());?></strong></td>
+		<td>&nbsp;</td>
+	</tr>
+<?php foreach ($reportRows as $reportRow) : ?>
+	<?php
+		if ($reportRow->status == 'Rejected') $style = 'style="color: red"';
+		elseif ($reportRow->status == 'Approved') $style = 'style="color: orange"';
+		elseif ($reportRow->status == 'Registered') $style = 'style="color: green"';
+		else $style = '';
+	?>
+	<tr class="approbation_rows">
+		<td><a class="glyphicon glyphicon-zoom-in" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale()) ?>" href="<?php echo $this->url('reportRow/detail', array('id' => $reportRow->id));?>?ctrl=approbation"></a></td>
+<?php if ($reportRow->category == 'Mileage allowance') : ?>
+		<td>&nbsp;</td>
+<?php else : ?>
+		<td><a class="glyphicon glyphicon-download-alt" title="<?php echo $this->translate('Proof', 'ppit-expense', $context->getLocale()) ?>" href="<?php echo $this->url('link/download', array('id' => $reportRow->document_id));?>"></a></td>
+<?php endif;?>
+		<td><?php echo $reportRow->period ?></td>
+		<td><?php echo $reportRow->agent_n_fn ?></td>
+		<td><?php echo substr($reportRow->expense_date, 8, 2).'/'.substr($reportRow->expense_date, 5, 2) ?></td>
+		<td><?php echo $this->translate($reportRow->category, 'ppit-expense', $context->getLocale()) ?></td>
+		<td <?php echo $style ?> align="right"><?php echo $currentUser->formatFloat($reportRow->capped_amount, 2, $currentUser) ?></td>
+		<td>
+	<?php if ($reportRow->status == 'Submitted') : ?>
+		<img height="12" src="<?php echo $this->basePath('images/clock.png'); ?>" title="<?php echo $this->translate('In progress') ?>" />
+	<?php elseif ($reportRow->status == 'Rejected') : ?>
+		<img height="12" src="<?php echo $this->basePath('images/thumb_down.png'); ?>" title="<?php echo $this->translate('Rejected') ?>" />
+	<?php elseif ($reportRow->status == 'Approved') : ?>
+		<img height="12" src="<?php echo $this->basePath('images/thumb_up.png'); ?>" title="<?php echo $this->translate('Approved') ?>" />
+	<?php elseif ($reportRow->status == 'Registered') : ?>
+		<img height="12" src="<?php echo $this->basePath('images/tick.png'); ?>" title="<?php echo $this->translate('Registered') ?>" />
+	<?php else : ?>
+	<?php endif;?>
+		</td>
+	</tr>
+<?php endforeach; ?>
+</table>
+			</div>
+		</div>
+
+<script>
+	//Override de la fonction "contains" pour permettre une recherche case-insensitive
+	jQuery.expr[':'].contains = jQuery.expr.createPseudo(function(arg) {
+	    return function( elem ) {
+	        return jQuery(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+	    };
+	});
+
+	//Recherche basée sur le champs input "search"
+	$("#search").bind("keyup", function(){
+		var strToSearch = $("#search").val();
+		$(".approbation_rows").hide();
+		$(".approbation_rows:contains('"+strToSearch+"')").show();
+	});
+</script>

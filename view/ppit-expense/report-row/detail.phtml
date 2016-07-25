@@ -1,0 +1,57 @@
+<?php
+	$title = $this->translate('Expense reports', 'ppit-expense', $context->getLocale());
+	echo $this->partial('/partials/menu');
+?>
+<?php
+$this->headTitle($title);
+?>
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+            
+<?php
+	if ($reportRow->status == 'Rejected') $style = 'style="color: red"';
+	elseif ($reportRow->status == 'Approved') $style = 'style="color: orange"';
+	elseif ($reportRow->status == 'Registered') $style = 'style="color: green"';
+	else $style = '';
+?>
+            	<strong>
+					<?php if ($reportRow->status == 'Submitted') : ?>
+						<?php echo $this->translate($this->translate('Expense report', 'ppit-expense', $context->getLocale()));?> :&nbsp;
+						<img height="12" src="<?php echo $this->basePath('images/clock.png'); ?>" alt="<?php echo $this->translate('In progress', 'ppit-expense', $context->getLocale()) ?>" />&nbsp;
+						<span <?php echo $style ?>><?php echo $this->translate('In progress', 'ppit-expense', $context->getLocale()) ?></span>
+					<?php elseif ($reportRow->status == 'Rejected') : ?>
+						<?php echo $this->translate($this->translate('Expense report', 'ppit-expense', $context->getLocale()));?> :&nbsp;
+						<img height="12" src="<?php echo $this->basePath('images/thumb_down.png'); ?>" alt="<?php echo $this->translate('Rejected', 'ppit-expense', $context->getLocale()) ?>" />&nbsp;
+						<span <?php echo $style ?>><?php echo $this->translate('Rejected', 'ppit-expense', $context->getLocale()) ?></span>
+					<?php elseif ($reportRow->status == 'Approved') : ?>
+						<?php echo $this->translate($this->translate('Expense report', 'ppit-expense', $context->getLocale()));?> :&nbsp;
+						<img height="12" src="<?php echo $this->basePath('images/thumb_up.png'); ?>" alt="<?php echo $this->translate('Approved', 'ppit-expense', $context->getLocale()) ?>" />&nbsp;
+						<span <?php echo $style ?>><?php echo $this->translate('Approved', 'ppit-expense', $context->getLocale()) ?></span>
+					<?php elseif ($reportRow->status == 'Registered') : ?>
+						<?php echo $this->translate($this->translate('Expense report', 'ppit-expense', $context->getLocale()));?> :&nbsp;
+						<img height="12" src="<?php echo $this->basePath('images/tick.png'); ?>" alt="<?php echo $this->translate('Registered', 'ppit-expense', $context->getLocale()) ?>" />&nbsp;
+						<span <?php echo $style ?>><?php echo $this->translate('Registered', 'ppit-expense', $context->getLocale()) ?></span>
+					<?php endif;?>
+				</strong>
+            </div>
+           	<div class="panel-body">
+<?php
+	echo $this->partial('/partials/detail', array(
+    		'context' => $context,
+    		'config' => $config,
+    		'reportRow' => $reportRow,
+    ));
+?>
+				
+<!-- Return link -->
+			    <div class="row">
+					<div class="col-md-6">&nbsp;</div>
+					<div class="col-md-6"><a href="<?php echo $this->url($returnUrl) ?>"><?php echo $this->translate('Return', 'ppit-core', $context->getLocale()) ?></a></div>
+				</div>
+								
+			</div>
+		</div>
+	</div>
+</div>

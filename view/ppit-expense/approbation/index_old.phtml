@@ -1,0 +1,168 @@
+<?php
+	echo $this->partial('/partials/menu');
+    $title = $this->translate('Expense reports', 'ppit-expense', $currentUser->locale);
+	$this->headTitle($title);
+
+	$currency = ($reportRows) ? $reportRows[0]->currency : '€';
+?>
+<div class="row">
+<!-- Budget -->
+<?php if ($currentUser->isAllowed('approbation/approbe')) : ?>
+    <div class="col-md-6">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('My staff', 'ppit-expense', $currentUser->locale) ?></strong>
+            </div>
+           	<div class="panel-body">
+           	
+<!-- Header -->
+				<table class="table-condensed">
+					<tr>
+						<td colspan="2">
+							<a href="<?php echo $this->url('reportRow/index');?>"><?php echo $this->translate('My expense reports', 'ppit-expense', $currentUser->locale) ?></a>&nbsp;&nbsp;|&nbsp;&nbsp;
+							<a href="<?php echo $this->url('approbation/todo');?>"><?php echo $this->translate('To be approved', 'ppit-expense', $currentUser->locale) ?></a>
+						</td>
+					</tr>
+
+					<tr><td colspan="2">&nbsp;</td></tr>
+
+<!--  Approver -->
+<?php if ($currentUser->role_id == 'approver') : ?>
+					<tr>
+						<td align="right"><strong><?php echo $this->translate('Approver', 'ppit-user', $currentUser->locale) ?></strong></td>
+						<td><?php echo $header['approver'] ?></td>
+					</tr>
+					<!--  <tr>
+						<td align="right"><strong><?php //echo $this->translate('To be approved', 'ppit-expense', $currentUser->locale).' ('.$currency.' '.$this->translate('incl. tax', 'ppit-expense', $currentUser->locale).')' ?></strong></td>
+						<td><?php //echo $currentUser->formatFloat($header['including_vat_sum'], 2) ?></td>
+					</tr> -->
+
+<!--  Accountant -->
+<?php else : ?>
+					<tr>
+						<td align="right"><strong><?php echo $this->translate('Accountant', 'ppit-user', $currentUser->locale) ?></strong></td>
+						<td><?php echo $header['approver'] ?></td>
+					</tr>
+					<tr>
+						<td align="right"><strong><?php //echo $this->translate('To be registered', 'ppit-expense', $currentUser->locale).' ('.$currency.' '.$this->translate('incl. tax', 'ppit-expense', $currentUser->locale).')' ?></strong></td>
+						<td><?php //echo $currentUser->formatFloat($header['including_vat_sum'], 2) ?></td>
+					</tr>
+
+<?php endif;?>
+
+					<tr><td colspan="2">&nbsp;</td></tr>
+				</table>
+
+<!-- Rows -->
+<table class="table table-striped">
+	<tr class="report_rows">
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td align="center">
+			<select id="period">
+<?php foreach ($periods as $period) : ?>
+				<option value="<?php echo $period['period'] ?>" <?php if (date('Y-m') == $period['period']) echo 'selected="selected"'; ?>><?php echo $period['period'] ?></option>
+<?php endforeach;?>
+			</select>
+			
+		</td>
+		<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?major=owner_id
+											<?php if ($major == 'owner_id' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $this->translate('Agent', 'ppit-core', $currentUser->locale);?></strong></td>
+		<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?major=expense_date
+											<?php if ($major == 'expense_date' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $this->translate('Date', 'ppit-core', $currentUser->locale);?></strong></td>
+		<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?major=category
+											<?php if ($major == 'category' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $this->translate('Category', 'ppit-core', $currentUser->locale);?></strong></td>
+		<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?major=including_vat_amount
+											<?php if ($major == 'including_vat_amount' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $currency.' '.$this->translate('incl. tax', 'ppit-expense', $currentUser->locale);?></strong></td>
+		<td>&nbsp;</td>
+	</tr>
+<?php foreach ($reportRows as $reportRow) : ?>
+	<?php
+		if ($reportRow->status == 'Rejected') $style = 'style="color: red"';
+		elseif ($reportRow->status == 'Approved') $style = 'style="color: orange"';
+		elseif ($reportRow->status == 'Registered') $style = 'style="color: green"';
+		else $style = '';
+	?>
+	<tr class="report_rows">
+		<td><a class="glyphicon glyphicon-zoom" title="<?php echo $this->translate('Detail', 'ppit-core', $currentUser->locale) ?> href="<?php echo $this->url('reportRow/detail', array('id' => $reportRow->id));?>?ctrl=approbation"></a></td>
+		<td><a href="<?php echo $this->url('link/download', array('id' => $reportRow->document_id));?>"><img height="12" src="<?php echo $this->basePath('images/download_1.png'); ?>" title="<?php echo $this->translate('Proof') ?>" /></a></td>
+		<td align="center"><?php echo $reportRow->period ?></td>
+		<td align="left"><?php echo $reportRow->agent_n_fn ?></td>
+		<td align="center"><?php echo substr($reportRow->expense_date, 8, 2).'/'.substr($reportRow->expense_date, 5, 2) ?></td>
+		<td align="center"><?php echo $this->translate($reportRow->category, 'ppit-expense', $currentUser->locale) ?></td>
+		<td <?php echo $style ?> align="right"><?php echo $currentUser->formatFloat($reportRow->capped_amount, 2, $currentUser) ?></td>
+		<td>
+	<?php if ($reportRow->status == 'Submitted') : ?>
+		<img height="12" src="<?php echo $this->basePath('images/clock.png'); ?>" title="<?php echo $this->translate('In progress') ?>" />
+	<?php elseif ($reportRow->status == 'Rejected') : ?>
+		<img height="12" src="<?php echo $this->basePath('images/thumb_down.png'); ?>" title="<?php echo $this->translate('Rejected') ?>" />
+	<?php elseif ($reportRow->status == 'Approved') : ?>
+		<img height="12" src="<?php echo $this->basePath('images/thumb_up.png'); ?>" title="<?php echo $this->translate('Approved') ?>" />
+	<?php elseif ($reportRow->status == 'Registered') : ?>
+		<img height="12" src="<?php echo $this->basePath('images/tick.png'); ?>" title="<?php echo $this->translate('Registered') ?>" />
+	<?php else : ?>
+	<?php endif;?>
+		</td>
+	</tr>
+<?php endforeach; ?>
+</table>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-6">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('My budget', 'ppit-expense', $currentUser->locale) ?></strong>
+            </div>
+           	<div class="panel-body">
+	 			<table class="table-condensed">
+					<tr>
+						<td align="center">&nbsp;</td>
+						<td align="center">
+							<strong><?php echo $this->translate('Budget', 'ppit-expense', $currentUser->locale) ?></strong> 
+						</td>
+						<td class="col-md-4" align="center">
+							<strong><?php echo $this->translate('Spent', 'ppit-expense', $currentUser->locale) ?></strong> 
+						</td>
+					</tr>
+	<?php foreach ($periods as $period) : ?>
+					<tr class="report_rows">
+						<td class="col-md-4" align="center">
+							<strong><?php echo $period['period'] ?></strong> 
+						</td>
+						<td class="col-md-4" align="right">
+							<?php echo $currentUser->formatFloat($period['expected'], 2) ?> <?php echo $currency.' '.$this->translate('incl. tax', 'ppit-expense', $currentUser->locale) ?>
+						</td>
+						<td class="col-md-4" align="right">
+								<?php echo $currentUser->formatFloat($period['achieved'], 2) ?> <?php echo $currency.' '.$this->translate('incl. tax', 'ppit-expense', $currentUser->locale) ?>
+						</td>
+					</tr>
+	<?php endforeach;?>
+				</table>
+            </div>
+        </div>
+    </div>
+<?php endif;?>
+</div>
+
+<script>
+
+	$(".report_rows").hide();
+	$(".report_rows:contains('<?php echo date('Y-m') ?>')").show();
+	
+	//Recherche basée sur le champ select "period"
+	$("#period").bind("change", function(){
+		var strToSearch = $("#period").val();
+		$(".report_rows").hide();
+		$(".report_rows:contains('"+strToSearch+"')").show();
+	});
+</script>

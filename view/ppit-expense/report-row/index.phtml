@@ -1,0 +1,126 @@
+<?php 
+$spa = $context->isSpaMode();
+$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
+?>
+
+<!-- Display header on MPA mode -->
+<?php if (!$spa) : ?>
+	<?php 
+		$this->current = 'vcard';
+		echo $this->partial('/partials/menu'); 
+	?>
+<div class="row">
+    <div class="col-md-6 col-md-offset-3">
+<?php endif;?>
+
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('Expense reports', 'ppit-expense', $context->getLocale());?></strong>
+            </div>
+           	<div class="panel-body">
+           	
+<!-- Header -->
+				<table class="table-condensed">
+<?php if ($context->isAllowed('approbation') || $context->isAllowed('report')) : ?>
+	<?php $menu = false; ?>
+					<tr>
+						<td colspan="2">
+	<?php if ($context->isAllowed('approbation')) : ?>
+		<?php $menu = true; ?>
+						<a href="<?php echo $this->url('approbation');?>"><?php echo $this->translate('My staff', 'ppit-expense', $context->getLocale()) ?></a>
+	<?php endif;?>
+	<?php if ($context->isAllowed('report')) : ?>
+		<?php if ($menu) : ?>
+						&nbsp;&nbsp;|&nbsp;&nbsp;
+		<?php endif;?>
+						<a href="<?php echo $this->url('report/todo');?>"><?php echo $this->translate('Accounting', 'ppit-expense', $context->getLocale()) ?></a>
+	<?php endif;?>
+						</td>
+					</tr>
+<?php endif;?>
+				
+					<tr><td colspan="2">&nbsp;</td></tr>
+					<tr>
+						<td align="right"><strong><?php echo $this->translate('Issuer', 'ppit-expense', $context->getLocale()) ?></strong></td>
+						<td><?php echo $header['issuer'] ?></td>
+					</tr>
+					<tr>
+						<td align="right"><strong><?php echo $this->translate('In progress', 'ppit-expense', $context->getLocale()) ?> (<?php echo $context->getCurrencySymbol() ?>)</strong></td>
+						<td><?php echo $context->formatFloat($header['capped_sum'], 2) ?></td>
+					</tr>
+					<tr><td colspan="2">&nbsp;</td></tr>
+				</table>
+
+<!-- Rows -->
+
+<table class="table table-striped">
+	<tr>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+		<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?major=expense_date
+											<?php if ($major == 'expense_date' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $this->translate('Date', 'ppit-core', $context->getLocale());?></strong></td>
+<!--		<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?major=category
+											<?php if ($major == 'category' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $this->translate('Category', 'ppit-core', $context->getLocale());?></strong></td> -->
+		<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
+											?major=including_vat_amount
+											<?php if ($major == 'including_vat_amount' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
+			<?php echo $context->getCurrencySymbol().' '.$this->translate('incl. tax', 'ppit-expense', $context->getLocale());?></strong></td>
+		<td>&nbsp;</td>
+	</tr>
+	<tr>
+		<td colspan="7">
+			<a href="<?php echo $this->url('reportRow/add');?>"><?php echo $this->translate('New request', 'ppit-core', $context->getLocale()) ?></a>
+			&nbsp;&nbsp;|&nbsp;&nbsp;
+			<a href="<?php echo $this->url('reportRow/mileage');?>"><?php echo $this->translate('Mileage allowances', 'ppit-expense', $context->getLocale()) ?></a>
+		</td>
+	</tr>
+<?php foreach ($reportRows as $reportRow) : ?>
+	<tr>
+	<?php
+		if ($reportRow->status == 'Rejected') $style = 'style="color: red"';
+		elseif ($reportRow->status == 'Approved') $style = 'style="color: orange"';
+		elseif ($reportRow->status == 'Registered') $style = 'style="color: green"';
+		else $style = '';
+	?>
+	<?php if ($reportRow->status == 'New' || $reportRow->status == 'Submitted' || $reportRow->status == 'Rejected') : ?>
+		<td><a class="glyphicon glyphicon-edit" title="<?php echo $this->translate('Update', 'ppit-core', $context->getLocale()) ?>" href="<?php echo $this->url((($reportRow->category == 'Mileage allowance') ? 'reportRow/mileage' : 'reportRow/update'), array('id' => $reportRow->id));?>"></a></td>
+		<td><a class="glyphicon glyphicon-trash" title="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>" href="<?php echo $this->url('reportRow/delete', array('id' => $reportRow->id));?>"></a></td>
+	<?php else : ?>
+		<td><a class="glyphicon glyphicon-zoom-in" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale()) ?>" href="<?php echo $this->url('reportRow/detail', array('id' => $reportRow->id));?>"></a></td>
+		<td>&nbsp;</td>
+	<?php endif;?>
+	
+	<?php if ($reportRow->category == 'Mileage allowance') : ?>
+		<td><?php echo $reportRow->quantity.' '.$this->translate('miles', 'ppit-expense', $context->getLocale()) ?></td>
+	<?php else : ?>
+		<td><a class="glyphicon glyphicon-download-alt" title="<?php echo $this->translate('Proof', 'ppit-expense', $context->getLocale()) ?>" href="<?php echo $this->url('link/download', array('id' => $reportRow->document_id));?>"></a></td>
+	<?php endif;?>
+		<td align="center"><?php echo substr($reportRow->expense_date, 8, 2).'/'.substr($reportRow->expense_date, 5, 2) ?></td>
+<!--		<td align="center"><?php echo ($reportRow->category) ? $this->translate($reportRow->category, 'ppit-expense', $context->getLocale()) : $this->translate('To define', 'ppit-expense', $context->getLocale()) ?></td> -->
+		<td <?php echo $style ?> align="right"><?php echo $context->formatFloat($reportRow->capped_amount, 2) ?></td>
+		<td>
+	<?php if ($reportRow->status == 'Submitted') : ?>
+		<span class="glyphicon glyphicon-time" title="<?php echo $this->translate('In progress', 'ppit-expense', $context->getLocale()) ?>"></span>
+	<?php elseif ($reportRow->status == 'Rejected') : ?>
+		<span class="glyphicon glyphicon-thumbs-down" title="<?php echo $this->translate('Rejected', 'ppit-expense', $context->getLocale()) ?>"></span>
+	<?php elseif ($reportRow->status == 'Approved') : ?>
+		<span class="glyphicon glyphicon-thumbs-up" title="<?php echo $this->translate('Approved', 'ppit-expense', $context->getLocale()) ?>"></span>
+	<?php elseif ($reportRow->status == 'Registered') : ?>
+		<span class="glyphicon glyphicon-ok" title="<?php echo $this->translate('Registered', 'ppit-expense', $context->getLocale()) ?>"></span>
+	<?php endif;?>
+		</td>
+	</tr>
+<?php endforeach; ?>
+</table>
+			</div>
+		</div>
+
+<?php if (!$spa) : ?>
+	</div>
+</div>
+<?php endif;?>

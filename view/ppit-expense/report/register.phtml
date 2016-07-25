@@ -1,0 +1,90 @@
+<?php
+    echo $this->partial('/partials/menu');
+    $title = $this->translate('Expense reports', 'ppit-expense', $context->getLocale());
+	$this->headTitle($title);
+?>
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('Register an expense report', 'ppit-expense', $context->getLocale()) ?></strong>
+            </div>
+           	<div class="panel-body">
+
+				<table class="table-condensed">
+<?php
+	echo $this->partial('/partials/detail', array(
+    		'context' => $context,
+    		'config' => $config,
+    		'reportRow' => $reportRow,
+    ));
+?>
+
+<!-- Form opening tag -->
+				<form action="<?php echo $this->url('report/register', array('id' => $id)) ?>" method="post" name="reportRow" class="form-horizontal" enctype="form-data" id="reportRow" onSubmit="return checkForm()">
+
+<!--  Isolation error -->
+				    <div class="form-group">
+						<input type="hidden" name="db_expense_date" value="<?php echo $reportRow->expense_date ?>">
+						<input type="hidden" name="db_category" value="<?php echo $reportRow->category ?>">
+						<input type="hidden" name="db_including_vat_amount" value="<?php echo $reportRow->including_vat_amount ?>">
+<?php if ($error == 'Isolation') : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The database has evolved in the meantime, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+					</div>
+				
+<!--  CSRF -->
+<?php $element = $csrfForm->get('csrf') ?>
+				    <div class="form-group">
+						<?php echo $this->formElement($element) ?>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+					</div>
+				
+<!-- Comment -->
+					<div class="form-group" id="comment_group">
+						<label class="col-sm-5 control-label"><?php echo $this->translate('Comment', 'ppit-core', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<textarea name="comment" rows="3" cols="100" id="comment" class="form-control"></textarea>
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="comment_error"></p></div>
+					</div>
+									
+<!-- Accept and Reject buttons -->
+				    <div class="form-group">
+						<div class="col-sm-3">&nbsp;</div>
+						<div class="col-sm-9">
+							<input name="register" type="submit" id="submitbutton" class="btn btn-primary" value="<?php echo $this->translate('Register', 'ppit-expense', $context->getLocale()) ?>">
+							&nbsp;&nbsp;
+							<a href="<?php echo $this->url('report/todo') ?>"><?php echo $this->translate('Cancel') ?></a>
+						</div>
+					</div>
+
+<!-- Form closing tag -->
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+
+// The elements are checked last to first so the focus is positionned on the first element on error
+function checkForm() 
+{
+	var validity = true;	
+	
+	// comment
+	if (document.getElementById("comment").value.length > 255) {
+		renderElement("comment", "<?php echo $this->translate('The comment is too long', 'ppit-expense', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+ 		renderElement("comment", null);
+	}
+
+	return validity;
+}
+
+</script>

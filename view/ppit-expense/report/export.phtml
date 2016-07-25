@@ -1,0 +1,40 @@
+<?php 
+header('Content-Type: text/csv; charset=utf-8');
+header("Content-disposition: filename=p-pit-notes-de-frais.csv");
+echo "\xEF\xBB\xBF";
+
+echo
+'Service'.";".
+'Agent'.";".
+'Période'.";".
+'Date de dépense'.";".
+'Validé le'.";".
+'Valideur'.";".
+'Enregistré le'.";".
+'Catégorie'.";".
+'Montant TTC'.";".
+'Montant TVA'.";".
+'Remboursement plafonné à'.";".
+'Justificatif n°'.";".
+'Nom du document'.";".
+"\n";
+
+foreach ($reportRows as $reportRow) {
+
+	echo	
+	$reportRow->org_unit_caption.";".
+	$reportRow->agent_n_fn.";".
+	substr($reportRow->expense_date, 0, 4).";".
+	$context->decodeDate($reportRow->expense_date).";".
+	$context->decodeDate($reportRow->approval_date).";".
+	$reportRow->approver_n_fn.";".
+	$context->decodeDate($reportRow->registration_date).";".
+	$this->translate($reportRow->category, 'ppit-expense', $context->getLocale()).";".
+	$context->formatFloat($reportRow->including_vat_amount, 2).";".
+	$context->formatFloat($reportRow->vat_1, 2).";".
+	$context->formatFloat($reportRow->capped_amount, 2).";".
+	$context->formatFloat($reportRow->document_id, 2).";".
+	$reportRow->name.";".
+	"\n";	
+}
+?>

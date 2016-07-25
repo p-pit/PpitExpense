@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="utf-8">
+        <title>$this->translate('Expense reports', 'ppit-expense', $context->getLocale());</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<link href="<?php echo $this->basePath('css/bootstrap.min.css') ?>" media="screen" rel="stylesheet" type="text/css">
+		<link href="<?php echo $this->basePath('css/bootstrap-theme.min.css') ?>" media="screen" rel="stylesheet" type="text/css">
+		<link href="<?php echo $this->basePath('css/style.css') ?>" media="screen" rel="stylesheet" type="text/css">
+		<link href="<?php echo $this->basePath('img/favicon.ico') ?>" rel="shortcut icon" type="image/vnd.microsoft.icon">
+		<script type="text/javascript" src="<?php echo $this->basePath('js/jquery.min.js') ?>"></script>
+		<script type="text/javascript" src="<?php echo $this->basePath('js/bootstrap.min.js') ?>"></script>
+	</head>
+<body>
+<?php echo $context->pdf_header_code ?>
+<style>
+table { 
+	border-width:1px;
+	border-style:solid; 
+	border-color:black;
+	border-collapse:collapse;
+	width:100%;
+}
+td { 
+	border-width:1px;
+	border-style:solid; 
+	border-color:black;
+	width:100%;
+}
+</style>
+<div class="row">
+    <div class="col-md-12">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+            	<div>
+					<strong><?php echo $this->translate('Expense report', 'ppit-expense', $context->getLocale()) ?></strong>
+				</div>
+				<div>&nbsp;</div>
+				<div>
+					<strong><?php echo $this->translate('Period:', 'ppit-expense', $context->getLocale()) ?></strong>&nbsp;
+					<?php echo $period ?>
+				</div>
+				<div>
+					<strong><?php echo $this->translate('Issuer:', 'ppit-expense', $context->getLocale()) ?></strong>&nbsp;
+					<?php echo $agent->n_fn ?>
+				</div>
+				<div>&nbsp;</div>
+			</div>
+           	<div class="panel-body">
+
+				<table class="table-condensed">
+
+<!--  COLUMNS HEADERS -->
+
+<?php $currency = ($reportRows) ? $reportRows[0]->currency : '€'; ?>
+					
+				    <tr class="row">
+						<td colspan="2">&nbsp;</td>
+
+<!-- Repaid amount -->
+						<td align="center" colspan="8"><strong><?php echo $this->translate('Repaid amount', 'ppit-expense', $context->getLocale()) ?></strong></td>
+
+<!-- Original amount -->
+						<td align="center" colspan="2"><strong><?php echo $this->translate('Original amount', 'ppit-expense', $context->getLocale()) ?></strong></td>
+
+					</tr>
+
+				    <tr class="row">
+<!-- Document name -->
+						<td align="center"><strong><?php echo $this->translate('Documentary evidence', 'ppit-expense', $context->getLocale()) ?></strong></td>
+
+<!-- Expense date -->
+						<td align="center"><strong><?php echo $this->translate('Expense date', 'ppit-expense', $context->getLocale()) ?></strong></td>
+
+<!-- Capped amount -->
+						<td align="center"><strong><?php echo $this->translate('Transport', 'ppit-expense', $context->getLocale()) ?></strong></td>
+						<td align="center"><strong><?php echo $this->translate('Invitation', 'ppit-expense', $context->getLocale()) ?></strong></td>
+						<td align="center"><strong><?php echo $this->translate('Reception', 'ppit-expense', $context->getLocale()) ?></strong></td>
+						<td align="center"><strong><?php echo $this->translate('Meal', 'ppit-expense', $context->getLocale()) ?></strong></td>
+						<td align="center"><strong><?php echo $this->translate('Overnight stay', 'ppit-expense', $context->getLocale()) ?></strong></td>
+						<td align="center"><strong><?php echo $this->translate('Supply', 'ppit-expense', $context->getLocale()) ?></strong></td>
+						<td align="center"><strong><?php echo $this->translate('Mileage allowance', 'ppit-expense', $context->getLocale()) ?></strong></td>
+						<td align="center"><strong><?php echo $this->translate('Total', 'ppit-expense', $context->getLocale()) ?></strong></td>
+
+<!-- Including VAT amount -->
+						<td align="center"><strong><?php echo $this->translate('incl. tax', 'ppit-expense', $context->getLocale()) ?></strong></td>
+
+<!-- VAT amount 1 -->
+						<td align="center"><strong><?php echo $this->translate('VAT', 'ppit-expense', $context->getLocale()) ?></strong></td>
+
+					</tr>
+<!--  ROWS -->
+					
+<?php foreach ($reportRows as $reportRow) : ?>
+	<?php if ($reportRow->status == 'Approved') $style = 'style="font-style: italic"'; else $style = ''; ?>
+					<tr class="row">
+<!-- Document name -->
+<?php if ($reportRow->category == 'Mileage allowance') : ?>
+						<td align="right" <?php echo $style ?>><?php echo $reportRow->quantity ?>&nbsp;<?php echo $this->translate('miles', 'ppit-expense', $context->getLocale()) ?></td>
+<?php else : ?>
+						<td <?php echo $style ?>><?php echo (strlen($reportRow->name) <= 20) ? $reportRow->name : substr($reportRow->name, 0, 17).'...' ?></td>
+<?php endif;?>
+
+<!-- Expense date -->
+						<td <?php echo $style ?>><?php echo $context->decodeDate($reportRow->expense_date) ?></td>
+	
+<!-- Capped amount -->
+	<?php if ($reportRow->category == 'Transport') : ?>
+						<td align="right" <?php echo $style ?>><?php echo $context->formatFloat($reportRow->capped_amount, 2) ?></td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+	<?php elseif ($reportRow->category == 'Invitation') : ?>
+						<td>&nbsp;</td>
+						<td align="right" <?php echo $style ?>><?php echo $context->formatFloat($reportRow->capped_amount, 2) ?></td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+	<?php elseif ($reportRow->category == 'Reception') : ?>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="right" <?php echo $style ?>><?php echo $context->formatFloat($reportRow->capped_amount, 2) ?></td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+	<?php elseif ($reportRow->category == 'Meal') : ?>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="right" <?php echo $style ?>><?php echo $context->formatFloat($reportRow->capped_amount, 2) ?></td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+	<?php elseif ($reportRow->category == 'Overnight stay') : ?>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="right" <?php echo $style ?>><?php echo $context->formatFloat($reportRow->capped_amount, 2) ?></td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+	<?php elseif ($reportRow->category == 'Supply') : ?>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="right" <?php echo $style ?>><?php echo $context->formatFloat($reportRow->capped_amount, 2) ?></td>
+						<td>&nbsp;</td>
+	<?php elseif ($reportRow->category == 'Mileage allowance') : ?>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td align="right" <?php echo $style ?>><?php echo $context->formatFloat($reportRow->capped_amount, 2) ?></td>
+	<?php else : ?>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+	<?php endif;?>
+						<td align="right" <?php echo $style ?>><?php echo $context->formatFloat($reportRow->capped_amount, 2) ?></td>
+	
+<!-- Including VAT amount -->
+						<td align="right" <?php echo $style ?>><?php echo $context->formatFloat($reportRow->including_vat_amount, 2) ?></td>
+					
+<!-- VAT amount 1 -->
+						<td align="right" <?php echo $style ?>><?php echo $context->formatFloat($reportRow->amount_vat_1, 2) ?></td>
+					
+					</tr>
+<?php endforeach;?>
+	
+<!--  SUMS -->
+				    <tr class="row">
+						<td colspan="2">&nbsp;</td>
+
+<!-- Capped amount -->
+						<td align="right"><strong><?php echo $context->formatFloat($transport_sum, 2) ?></strong></td>
+						<td align="right"><strong><?php echo $context->formatFloat($invitation_sum, 2) ?></strong></td>
+						<td align="right"><strong><?php echo $context->formatFloat($reception_sum, 2) ?></strong></td>
+						<td align="right"><strong><?php echo $context->formatFloat($meal_sum, 2) ?></strong></td>
+						<td align="right"><strong><?php echo $context->formatFloat($overnight_stay_sum, 2) ?></strong></td>
+						<td align="right"><strong><?php echo $context->formatFloat($supply_sum, 2) ?></strong></td>
+						<td align="right"><strong><?php echo $context->formatFloat($mileage_allowance_sum, 2) ?></strong></td>
+						<td align="right"><strong><?php echo $context->formatFloat($capped_sum, 2) ?></strong></td>
+						
+<!-- Including VAT amount -->
+						<td align="right"><strong><?php echo $context->formatFloat($including_vat_sum, 2) ?></td>
+					
+<!-- VAT amount 1 -->
+						<td align="right"><strong><?php echo $context->formatFloat($vat_1_sum, 2) ?></td>
+
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+	</body>
+</html>

@@ -1,0 +1,218 @@
+<?php
+	$title = $this->translate('Expense reports', 'ppit-expense', $context->getLocale());
+	echo $this->partial('/partials/menu');
+?>
+<?php
+$this->headTitle($title);
+?>
+<div class="row">
+	<div class="col-md-4 col-md-offset-4">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('Mileage allowances', 'ppit-expense', $context->getLocale());?></strong>
+            </div>
+           	<div class="panel-body">
+
+<!-- Global message -->
+<?php if ($message == 'OK') : ?>
+				<div class="form-group notification">
+					<div class="col-sm-12"><?php echo $this->translate('Your request have been registered', 'ppit-core', $context->getLocale()) ?></div>
+				</div>
+<?php endif;?>
+           	
+				<table class="table-condensed">
+           	
+<!-- Annual distance -->
+				    <tr class="row">
+						<td colspan="2"><strong><?php echo $this->translate('Annual distance traveled', 'ppit-expense', $context->getLocale()) ?></strong></td>
+					</tr>
+					
+<?php foreach ($reportRow->mileageScales as $horsepower) : ?>
+<?php foreach ($horsepower as $mileageScale) : ?>
+<?php if ($mileageScale->annual_sum) : ?>
+					<tr class="row">
+						<td align="right"><?php echo $mileageScale->horsepower ?> : <?php echo $mileageScale->annual_sum ?> km <span class="glyphicon glyphicon-comment" title="<?php echo $mileageScale->scale_caption ?>"></span></td>
+						<td><?php echo $context->formatFloat($mileageScale->fix_scale + $mileageScale->annual_sum * $mileageScale->variable_scale, 2) ?> €</td>
+					</tr>
+<?php endif;?>
+<?php endforeach;?>
+<?php endforeach;?>
+				</table>
+
+<!-- Form opening tag -->
+				<form action="<?php echo $this->url('reportRow/mileage', array('id' => $id)) ?>" method="post" name="reportRow/mileage" class="form-horizontal" onSubmit="return checkForm()">
+
+<!-- Global error -->
+<?php if ($error == 'Isolation') : ?>
+					<div class="form-group">
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The database has evolved in the meantime, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+					</div>
+<?php endif;?>
+
+<!--  CSRF -->
+<?php $element = $csrfForm->get('csrf') ?>
+				    <div class="form-group">
+						<?php echo $this->formElement($element) ?>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('The form has expired, please input again', 'ppit-core', $context->getLocale()) ?></p></div>
+<?php endif;?>
+					</div>
+
+<!-- Expense date -->
+				    <div class="form-group" id="input_expense_date_group">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Travel date', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input id="input_expense_date" class="form-control" value="<?php echo $context->decodeDate($reportRow->expense_date) ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
+							<input type="hidden" name="expense_date" id="expense_date">
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="input_expense_date_error"></p></div>
+					</div>
+					
+<!-- Horsepower -->
+				    <div class="form-group" id="horsepower_group">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Horsepower', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<select name="horsepower" id="horsepower" class="form-control" value="<?php echo $reportRow->horsepower ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
+								<option value=""><-- <?php echo $this->translate('Please choose', 'ppit-core', $context->getLocale()) ?> --></option>
+<?php foreach ($reportRow->horsepowers as $horsepower) : ?>
+								<option value="<?php echo $horsepower ?>" <?php if ($horsepower == $reportRow->horsepower) echo 'selected="selected"'; ?>><?php echo $horsepower ?></option>
+<?php endforeach;?>
+							</select>
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="horsepower_error"></p></div>
+					</div>
+					
+<!-- Distance -->
+				    <div class="form-group" id="input_quantity_group">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Number of miles', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input name="input_quantity" id="input_quantity" class="form-control" value="<?php echo $reportRow->quantity ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
+							<input type="hidden" name="quantity" id="quantity">
+							</div>
+						<div class="col-sm-12"><p class="help-block" id="input_quantity_error"></p></div>
+					</div>
+
+<!-- Destination -->
+				    <div class="form-group" id="destination_group">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Destination', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input name="destination" id="destination" class="form-control" value="<?php echo $reportRow->destination ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="destination_error"></p></div>
+					</div>
+					
+<!-- Justification -->
+				    <div class="form-group" id="justification_group">
+						<label class="col-sm-5 control-label">* <?php echo $this->translate('Justification', 'ppit-expense', $context->getLocale()) ?></label>
+						<div class="col-sm-7">
+							<input name="justification" id="justification" class="form-control" value="<?php echo $reportRow->justification ?>"<?php if ($message == 'OK') echo 'disabled="disabled"' ?>>
+						</div>
+						<div class="col-sm-12"><p class="help-block" id="justification_error"></p></div>
+					</div>
+					
+<?php if ($message == 'OK') : ?>
+
+				    <div class="form-group">
+						<div class="col-sm-5">&nbsp;</div>
+						<div class="col-sm-7">
+							<a href="<?php echo $this->url('reportRow') ?>"><?php echo $this->translate('Return', 'ppit-core', $context->getLocale()) ?></a>
+						</div>
+					</div>
+
+<?php else : ?>
+					
+<!-- Submit button -->
+				    <div class="form-group">
+						<div class="col-sm-5">&nbsp;</div>
+				    	<div class="col-sm-7">
+							<input name="submit" type="submit" id="submit" class="btn btn-primary" value="<?php echo $this->translate('Declare', 'ppit-expense', $context->getLocale()) ?>">
+							&nbsp;&nbsp;
+							<a href="<?php echo $this->url('reportRow') ?>"><?php echo $this->translate('Cancel', 'ppit-core', $context->getLocale()) ?></a>
+						</div>
+					</div>
+<?php endif;?>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+
+<script>
+
+//Set datepicker on expense date
+	jQuery(document).ready(function($){
+	    $("#input_expense_date").datepicker();
+	});
+
+// The elements are checked last to first so the focus is positionned on the first element on error
+function checkForm() 
+{
+	validity = true;	
+	
+	// Justification
+	if (document.getElementById("justification").value == "") {
+		renderElement("justification", "<?php echo $this->translate('Please input a value', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("justification", null);
+	}
+	
+	// Destination
+	if (document.getElementById("destination").value == "") {
+		renderElement("destination", "<?php echo $this->translate('Please input a value', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("destination", null);
+	}
+	
+	number = document.getElementById("input_quantity").value;
+	error = checkNumber(number, 0, 999999);
+	if (error) {
+		renderElement("input_quantity", error);
+		validity = false;
+	}
+	else { 
+		renderElement("input_quantity", null);
+		number = getNumber(number, 2);
+		document.getElementById("quantity").value = number;
+	}
+	
+	// horsepower
+	if (document.getElementById("horsepower").value == "") {
+		renderElement("horsepower", "<?php echo $this->translate('A value should be selected', 'ppit-core', $context->getLocale()) ?>");
+		validity = false;
+	}
+    else {
+		renderElement("horsepower", null);
+	}
+	
+	// expense_date
+    var date = document.getElementById('input_expense_date').value;
+	error = checkDate(date);
+	if (error) {
+		renderElement("input_expense_date", error);
+		validity = false;
+	}
+    else {
+
+<?php $minDate = (date('m') == '01') ? (date('Y') - 1).'-'.date('01').'-'.'01' : date('Y').'-'.date('01').'-'.'01'; ?>
+		date = encodeDate(date);
+		if (date < "<?php echo $minDate ?>") {
+			renderElement("input_expense_date", "<?php echo $this->translate('The date should not be less than', 'ppit-expense', $context->getLocale()) ?> <?php echo $context->decodeDate($minDate) ?>");
+			validity = false;
+		}
+		else {
+			renderElement("input_expense_date", null);
+			document.getElementById('expense_date').value = date;
+		}
+    }
+	
+	return validity;
+}
+
+</script>

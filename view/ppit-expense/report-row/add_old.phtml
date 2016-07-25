@@ -1,0 +1,248 @@
+<?php
+	$title = $this->translate('Expense reports', 'ppit-expense', $currentUser->locale);
+	echo $this->partial('/partials/menu');
+?>
+<?php
+$this->headTitle($title);
+?>
+<div class="row">
+	<div class="col-md-4 col-md-offset-4">
+		<div class="panel panel-default">
+            <div class="panel-heading">
+				<strong><?php echo $this->translate('Add an expense report', 'ppit-expense', $currentUser->locale);?></strong>
+            </div>
+           	<div class="panel-body">
+
+<!-- Form opening tag -->
+				<form action="<?php echo $this->url('reportRow/add') ?>" method="post" name="reportRow" class="form-horizontal" enctype="multipart/form-data" id="reportRow">
+	
+<!-- Name -->
+<?php $element = $form->get('name'); ?>
+<?php $element->setAttribute('class', 'form-control'); ?>
+					<div class="col-sm-12">&nbsp;</div>
+				    <div class="form-group" <?php if ($this->formElementErrors($element)) echo "has-error" ?>">
+						<div class="col-sm-12">
+							<input type="file" name="name" id="name" class="form-control"> 
+						</div>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><?php echo $this->formElementErrors()
+								                	->setMessageOpenFormat('<p class="help-block">')
+	                  								->setMessageSeparatorString('</p><p class="help-block">')
+	                  								->setMessageCloseString('</p>')
+	                  								->render($element) ?>
+						</div>
+<?php endif;?>
+					</div>
+	
+<!-- Expense date -->
+<?php 
+	$element = $form->get('expense_date');
+    $minDate = (date('m') == '01') ? (date('Y') - 1).'-'.date('01').'-'.'01' : date('Y').'-'.date('01').'-'.'01';
+?>
+					<div class="col-sm-12">&nbsp;</div>
+				    <div class="form-group" <?php if ($this->formElementErrors($element)) echo "has-error" ?>">
+						<label class="col-sm-6 control-label"><?php echo $this->translate('Expense date', 'ppit-expense', $currentUser->locale) ?></label>
+						<div class="col-sm-6">
+							<input type="date" name="expense_date" id="expense_date" min="<?php echo $minDate ?>" max="<?php echo date('Y-m-d') ?>" step="1" class="form-control" value="<?php echo $element->getValue() ?>">
+						</div>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><?php echo $this->formElementErrors()
+								                	->setMessageOpenFormat('<p class="help-block">')
+	                  								->setMessageSeparatorString('</p><p class="help-block">')
+	                  								->setMessageCloseString('</p>')
+	                  								->render($element) ?>
+						</div>
+<?php endif;?>
+					</div>
+	
+<!-- Category -->
+<?php 
+	$element = $form->get('category');
+	$element->setAttribute('class', 'form-control');
+?>
+					<div class="col-sm-12">&nbsp;</div>
+				    <div class="form-group <?php if ($this->formElementErrors($element)) echo 'has-error' ?>">
+						<label class="col-sm-6 control-label"><?php echo $this->translate('Category', 'ppit-core', $currentUser->locale) ?></label>
+						<div class="col-sm-6">
+							<select name="category" id="category" class="form-control">
+								<option value="">--- <?php echo $this->translate('Please choose', 'ppit-core', $currentUser->locale) ?> ---</option>
+<?php foreach ($settings['categories'] as $id => $caption) : ?>
+								<option value="<?php echo $id ?>"  <?php if ($id == $element->getValue()) echo 'selected="selected"'; ?>><?php echo $this->translate($caption, 'ppit-expense', $currentUser->locale) ?></option>
+<?php endforeach;?>
+							</select>
+						</div>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><?php echo $this->formElementErrors()
+								                	->setMessageOpenFormat('<p class="help-block">')
+	                  								->setMessageSeparatorString('</p><p class="help-block">')
+	                  								->setMessageCloseString('</p>')
+	                  								->render($element) ?>
+						</div>
+<?php endif;?>
+					</div>
+	
+<!-- Including VAT amount -->
+<?php $element = $form->get('including_vat_amount'); ?>
+<?php $element->setAttribute('class', 'form-control'); ?>
+					<div class="col-sm-12">&nbsp;</div>
+				    <div class="form-group <?php if ($this->formElementErrors($element)) echo 'has-error' ?>">
+						<label class="col-sm-6 control-label"><?php echo $this->translate('Including VAT amount', 'ppit-expense', $currentUser->locale) ?></label>
+						<div class="col-sm-6">
+							<input type="number" name="including_vat_amount" id="including_vat_amount" min="0" max="999999" step="0.01" class="form-control" value="<?php echo $element->getValue() ?>">
+						</div>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><?php echo $this->formElementErrors()
+								                	->setMessageOpenFormat('<p class="help-block">')
+	                  								->setMessageSeparatorString('</p><p class="help-block">')
+	                  								->setMessageCloseString('</p>')
+	                  								->render($element) ?>
+						</div>
+<?php endif;?>
+					</div>
+	
+<!-- VAT rate 1 -->
+<?php 
+	$element = $form->get('vat_rate_1');
+	$element->setAttribute('class', 'form-control');
+?>
+					<div class="col-sm-12">&nbsp;</div>
+				    <div class="form-group <?php if ($this->formElementErrors($element)) echo "has-error" ?>">
+						<label class="col-sm-6 control-label"><?php echo $this->translate('VAT rate', 'ppit-expense', $currentUser->locale) ?> 1</label>
+						<div class="col-sm-6">
+							<select name="vat_rate_1" id="vat_rate_1" class="form-control">
+								<option value="">--- <?php echo $this->translate('Please choose', 'ppit-core', $currentUser->locale) ?> ---</option>
+<?php foreach ($settings['vatRates'] as $rate => $caption) : ?>
+								<option value="<?php echo $rate ?>" <?php if ($rate == $element->getValue()) echo 'selected="selected"'; ?>><?php echo $this->translate($caption, 'ppit-expense', $currentUser->locale) ?></option>
+<?php endforeach;?>
+							</select>
+						</div>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><?php echo $this->formElementErrors()
+								                	->setMessageOpenFormat('<p class="help-block">')
+	                  								->setMessageSeparatorString('</p><p class="help-block">')
+	                  								->setMessageCloseString('</p>')
+	                  								->render($element) ?>
+						</div>
+<?php endif;?>
+					</div>
+	
+<!-- VAT amount 1 -->
+<?php $element = $form->get('vat_amount_1'); ?>
+<?php $element->setAttribute('class', 'form-control'); ?>
+					<div class="col-sm-12">&nbsp;</div>
+				    <div class="form-group <?php if ($this->formElementErrors($element)) echo 'has-error' ?>">
+						<label class="col-sm-6 control-label"><?php echo $this->translate('VAT amount', 'ppit-expense', $currentUser->locale) ?> 1</label>
+						<div class="col-sm-6">
+							<input type="number" name="vat_amount_1" id="vat_amount_1" min="0" max="999999" step="0.01" class="form-control" value="<?php echo $element->getValue() ?>">
+						</div>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><?php echo $this->formElementErrors()
+								                	->setMessageOpenFormat('<p class="help-block">')
+	                  								->setMessageSeparatorString('</p><p class="help-block">')
+	                  								->setMessageCloseString('</p>')
+	                  								->render($element) ?>
+						</div>
+<?php endif;?>
+					</div>
+	
+<!-- VAT rate 2 -->
+<?php 
+	$element = $form->get('vat_rate_2');
+	$element->setAttribute('class', 'form-control');
+?>
+					<div class="col-sm-12">&nbsp;</div>
+				    <div class="form-group <?php if ($this->formElementErrors($element)) echo "has-error" ?>">
+						<label class="col-sm-6 control-label"><?php echo $this->translate('VAT rate', 'ppit-expense', $currentUser->locale) ?> 2</label>
+						<div class="col-sm-6">
+							<select name="vat_rate_2" id="vat_rate_2" class="form-control">
+								<option value="">--- <?php echo $this->translate('Please choose', 'ppit-core', $currentUser->locale) ?> ---</option>
+<?php foreach ($settings['vatRates'] as $rate => $caption) : ?>
+								<option value="<?php echo $rate ?>" <?php if ($rate == $element->getValue()) echo 'selected="selected"'; ?>><?php echo $this->translate($caption, 'ppit-expense', $currentUser->locale) ?></option>
+<?php endforeach;?>
+							</select>
+						</div>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><?php echo $this->formElementErrors()
+								                	->setMessageOpenFormat('<p class="help-block">')
+	                  								->setMessageSeparatorString('</p><p class="help-block">')
+	                  								->setMessageCloseString('</p>')
+	                  								->render($element) ?>
+						</div>
+<?php endif;?>
+					</div>
+	
+<!-- VAT amount 2 -->
+<?php $element = $form->get('vat_amount_2'); ?>
+<?php $element->setAttribute('class', 'form-control'); ?>
+					<div class="col-sm-12">&nbsp;</div>
+				    <div class="form-group <?php if ($this->formElementErrors($element)) echo 'has-error' ?>">
+						<label class="col-sm-6 control-label"><?php echo $this->translate('VAT amount', 'ppit-expense', $currentUser->locale) ?> 2</label>
+						<div class="col-sm-6">
+							<input type="number" name="vat_amount_2" id="vat_amount_2" min="0" max="999999" step="0.01" class="form-control" value="<?php echo $element->getValue() ?>">
+						</div>
+<?php if ($this->formElementErrors($element)) : ?>
+						<div class="col-sm-12"><?php echo $this->formElementErrors()
+								                	->setMessageOpenFormat('<p class="help-block">')
+	                  								->setMessageSeparatorString('</p><p class="help-block">')
+	                  								->setMessageCloseString('</p>')
+	                  								->render($element) ?>
+						</div>
+<?php endif;?>
+					</div>
+					
+<!-- Submit button -->
+<?php $accept = $form->get('submit'); ?>
+<?php $accept->setAttribute('class', 'btn btn-primary'); ?>
+				    <div class="form-group">
+						<div class="col-sm-6">&nbsp;</div>
+						<div class="col-sm-6">
+							<input name="submit" type="submit" id="submitbutton" class="btn btn-primary" value="<?php echo $this->translate('Add', 'ppit-core', $currentUser->locale) ?>">
+							&nbsp;&nbsp;
+							<a href="<?php echo $this->url('reportRow') ?>"><?php echo $this->translate('Cancel', 'ppit-core', $currentUser->locale) ?></a>
+						</div>
+					</div>
+
+<!-- Insert hidden fields -->
+<?php foreach ($form as $element) : ?>
+	<?php if ($element->getAttributes()['type'] == 'hidden') : ?>
+					<?php echo $this->formElement($element) ?>
+	<?php endif;?>
+<?php endforeach;?>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--  Date picker script  -->
+
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
+<link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/themes/smoothness/jquery-ui.css" />
+  <script>
+  
+  
+  $.datepicker.regional['fr'] = {
+    closeText: 'Fermer',
+    prevText: 'Précédent',
+    nextText: 'Suivant',
+    currentText: 'Aujourd\'hui',
+    monthNames: ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'],
+    monthNamesShort: ['Janv.','Févr.','Mars','Avril','Mai','Juin','Juil.','Août','Sept.','Oct.','Nov.','Déc.'],
+    dayNames: ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'],
+    dayNamesShort: ['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'],
+    dayNamesMin: ['D','L','M','M','J','V','S'],
+    weekHeader: 'Sem.',
+	dateFormat: 'yy-mm-dd',
+    firstDay: 1,
+    isRTL: false,
+    showMonthAfterYear: false,
+    yearSuffix: ''
+};
+$.datepicker.setDefaults($.datepicker.regional['fr']);
+
+jQuery(document).ready(function($){
+    $("#expense_date").datepicker();
+});
+  </script>
