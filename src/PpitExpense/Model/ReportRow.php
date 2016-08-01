@@ -140,8 +140,8 @@ class ReportRow implements InputFilterAwareInterface
     public function retrieveMileageProperties($year)
     {
     	$context = Context::getCurrent();
-    	if (!$this->owner_id) $this->owner_id = $context->getAgentId();
-    	if (!$this->org_unit_id) $this->org_unit_id = $context->getOrgUnitId();
+    	if (!$this->owner_id) $this->owner_id = $context->getContactId();
+//    	if (!$this->org_unit_id) $this->org_unit_id = $context->getOrgUnitId();
 
     	// Store the mileage scale in a 2-dim array
     	$select = MileageScale::getTable()->getSelect()

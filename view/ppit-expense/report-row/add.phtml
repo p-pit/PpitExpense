@@ -1,9 +1,10 @@
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
+
 <?php
-	$title = $this->translate('Expense reports', 'ppit-expense', $context->getLocale());
-	echo $this->partial('/partials/menu');
-?>
-<?php
+$title = $context->getConfig('reportRow/index')['title'][$context->getLocale()];
 $this->headTitle($title);
+echo $context->getHeaderCode();
 ?>
 <div class="row">
 	<div class="col-md-4 col-md-offset-4">

@@ -75,7 +75,7 @@ class MileageScale implements InputFilterAwareInterface
     {
     	if (!MileageScale::$table) {
     		$sm = Context::getCurrent()->getServiceManager();
-    		MileageScale::$table = $sm->get('PpitCore\Model\MileageScaleTable');
+    		MileageScale::$table = $sm->get('PpitExpense\Model\MileageScaleTable');
     	}
     	return MileageScale::$table;
     }

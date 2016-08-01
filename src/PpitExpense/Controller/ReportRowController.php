@@ -3,7 +3,7 @@ namespace PpitExpense\Controller;
 
 use PpitCore\Model\Csrf;
 use PpitCore\Model\Context;
-use PpitCore\Model\Link;
+use PpitDocument\Model\Document;
 use PpitCore\Form\CsrfForm;
 use PpitExpense\Model\MileageScale;
 use PpitExpense\Model\ReportRow;
@@ -66,7 +66,6 @@ class ReportRowController extends AbstractActionController
     		'reportRows' => $reportRows,
     		'header' => $header,
         ));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
    		return $view;
     }
 
@@ -81,7 +80,7 @@ class ReportRowController extends AbstractActionController
 
     	// Retrieve the parent link
     	$id = (int) $this->params()->fromRoute('id', null);
-    	$parent = Link::getTable()->get($id, 'parent_id');
+    	$parent = Document::getTable()->get($id, 'parent_id');
 
     	$csrfForm = new CsrfForm();
     	$csrfForm->addCsrfElement('csrf');
@@ -183,7 +182,6 @@ class ReportRowController extends AbstractActionController
     		'error' => $error,
     		'reportRow' => $reportRow,
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
    		return $view;
     }
 
@@ -267,7 +265,6 @@ class ReportRowController extends AbstractActionController
     			'error' => $error,
     			'message' => $message
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
    		return $view;
     }
 

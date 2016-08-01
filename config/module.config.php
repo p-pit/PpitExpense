@@ -383,4 +383,7 @@ return array(
 					),
 			),
 	),
+	'reportRow/index' => array(
+			'title' => array('en_US' => 'P-PIT Expense report', 'fr_FR' => 'P-PIT Notes de frais'),
+	),
 );

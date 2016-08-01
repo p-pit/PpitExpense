@@ -1,17 +1,13 @@
-<?php 
-$spa = $context->isSpaMode();
-$anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
-?>
+<!-- Load the common form javascript functions -->
+<?php echo $this->partial('/partials/common-form-js.phtml'); ?>
 
-<!-- Display header on MPA mode -->
-<?php if (!$spa) : ?>
-	<?php 
-		$this->current = 'vcard';
-		echo $this->partial('/partials/menu'); 
-	?>
+<?php
+$title = $context->getConfig('reportRow/index')['title'][$context->getLocale()];
+$this->headTitle($title);
+echo $context->getHeaderCode();
+?>
 <div class="row">
     <div class="col-md-6 col-md-offset-3">
-<?php endif;?>
 
 		<div class="panel panel-default">
             <div class="panel-heading">
@@ -45,7 +41,7 @@ $anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
 						<td><?php echo $header['issuer'] ?></td>
 					</tr>
 					<tr>
-						<td align="right"><strong><?php echo $this->translate('In progress', 'ppit-expense', $context->getLocale()) ?> (<?php echo $context->getCurrencySymbol() ?>)</strong></td>
+						<td align="right"><strong><?php echo $this->translate('In progress', 'ppit-expense', $context->getLocale()) ?> (€)</strong></td>
 						<td><?php echo $context->formatFloat($header['capped_sum'], 2) ?></td>
 					</tr>
 					<tr><td colspan="2">&nbsp;</td></tr>
@@ -69,7 +65,7 @@ $anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
 		<td align="center"><strong><a href="<?php echo $this->url($this->route, array('action' => 'index')) ?>
 											?major=including_vat_amount
 											<?php if ($major == 'including_vat_amount' && $dir =='ASC') echo '&dir=DESC'; else echo '&dir=ASC' ?>">
-			<?php echo $context->getCurrencySymbol().' '.$this->translate('incl. tax', 'ppit-expense', $context->getLocale());?></strong></td>
+			<?php echo '€ '.$this->translate('incl. tax', 'ppit-expense', $context->getLocale());?></strong></td>
 		<td>&nbsp;</td>
 	</tr>
 	<tr>
@@ -119,8 +115,5 @@ $anchorStyle = ($spa) ? $context->getAnchorStyle() : 'classic';
 </table>
 			</div>
 		</div>
-
-<?php if (!$spa) : ?>
 	</div>
 </div>
-<?php endif;?>
