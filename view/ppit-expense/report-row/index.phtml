@@ -4,7 +4,7 @@
 <?php
 $title = $context->getConfig('reportRow/index')['title'][$context->getLocale()];
 $this->headTitle($title);
-echo $context->getHeaderCode();
+echo $this->partial('/partials/header');
 ?>
 <div class="row">
     <div class="col-md-6 col-md-offset-3">
