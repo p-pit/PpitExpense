@@ -375,11 +375,13 @@ return array(
 	),
 
 	'ppitRoles' => array(
-			'approver' => array(
-					'show' => true,
-					'labels' => array(
-							'en_US' => 'Approver',
-							'fr_FR' => 'Valideur',
+			'ppitExpense' => array(
+					'approver' => array(
+							'show' => true,
+							'labels' => array(
+									'en_US' => 'Approver',
+									'fr_FR' => 'Valideur',
+							),
 					),
 			),
 	),
