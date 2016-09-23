@@ -375,7 +375,7 @@ return array(
 	),
 
 	'ppitRoles' => array(
-			'ppitExpense' => array(
+			'PpitExpense' => array(
 					'approver' => array(
 							'show' => true,
 							'labels' => array(
