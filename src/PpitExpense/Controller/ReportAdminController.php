@@ -1,11 +1,11 @@
 <?php
 namespace PpitExpense\Controller;
 
-use PpitContact\Model\Vcard;
 use PpitCore\Model\Csrf;
 use PpitCore\Model\Context;
 use PpitCore\Model\Instance;
 use PpitCore\Model\Link;
+use PpitCore\Model\Vcard;
 use PpitMasterData\Model\Agent;
 use PpitMasterData\Model\AgentAttachment;
 use PpitMasterData\Model\OrgUnit;

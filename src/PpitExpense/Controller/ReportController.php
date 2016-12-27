@@ -33,7 +33,7 @@ class ReportController extends AbstractActionController
    		$select
    			->columns(array('period', 'owner_id'))
    			->join('md_agent', 'expense_report_row.owner_id = md_agent.id', array(), 'left')
-			->join('contact_vcard', 'md_agent.contact_id = contact_vcard.id', array('agent_n_fn' => 'n_fn'), 'left')
+			->join('core_vcard', 'md_agent.contact_id = core_vcard.id', array('agent_n_fn' => 'n_fn'), 'left')
    			->order(array($major.' '.$dir, 'period', 'owner_id'))
    			->quantifier(Select::QUANTIFIER_DISTINCT)
 			->where->in('status', array('Approved', 'registered'));
@@ -150,7 +150,7 @@ class ReportController extends AbstractActionController
     	$select = ReportRow::getTable()->getSelect();
     	$select->order(array($major.' '.$dir, 'expense_date DESC'))
 	    	->join('user', 'expense_report_row.owner_id = user.user_id', array(), 'left')
-    		->join('contact_vcard', 'user.contact_id = contact_vcard.id', array('agent_n_fn' => 'n_fn'), 'left')
+    		->join('core_vcard', 'user.contact_id = core_vcard.id', array('agent_n_fn' => 'n_fn'), 'left')
     		->join('core_link', 'expense_report_row.document_id = core_link.id', array('name'), 'left')
     		->where(array('status' => 'Approved'))
     		->where->in('expense_report_row.org_unit_id', $subSelect);
@@ -325,9 +325,9 @@ class ReportController extends AbstractActionController
     		->join('core_link', 'expense_report_row.document_id = core_link.id', array('name'), 'left')
     		->join('md_org_unit', 'expense_report_row.org_unit_id = md_org_unit.id', array('org_unit_caption' => 'caption'), 'left')
     		->join(array('agent' => 'md_agent'), 'expense_report_row.owner_id = agent.id', array(), 'left')
-    		->join(array('agent_vcard' => 'contact_vcard'), 'agent.contact_id = agent_vcard.id', array('agent_n_fn' => 'n_fn'), 'left')
+    		->join(array('agent_vcard' => 'core_vcard'), 'agent.contact_id = agent_vcard.id', array('agent_n_fn' => 'n_fn'), 'left')
     		->join(array('approver' => 'user'), 'expense_report_row.approver_id = approver.user_id', array(), 'left')
-   		 	->join(array('approver_vcard' => 'contact_vcard'), 'approver.contact_id = approver_vcard.id', array('approver_n_fn' => 'n_fn'), 'left')
+   		 	->join(array('approver_vcard' => 'core_vcard'), 'approver.contact_id = approver_vcard.id', array('approver_n_fn' => 'n_fn'), 'left')
    	 		->where(array('expense_report_row.status' => 'registered'));
     	$cursor = ReportRow::getTable()->selectWith($select);
     

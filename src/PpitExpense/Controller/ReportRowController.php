@@ -313,7 +313,7 @@ class ReportRowController extends AbstractActionController
     		'reportRow' => $reportRow,
     		'returnUrl' => $this->params()->fromQuery('ctrl', 'reportRow'),
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
     	 
@@ -408,7 +408,7 @@ class ReportRowController extends AbstractActionController
     		'id' => $id,
     		'error' => $error
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 
@@ -479,7 +479,7 @@ class ReportRowController extends AbstractActionController
     		'id' => $id,
     		'error' => $error
     	));
-   		if ($context->isSpaMode()) $view->setTerminal(true);
+   		$view->setTerminal(true);
    		return $view;
     }
 }

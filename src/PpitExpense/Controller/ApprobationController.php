@@ -61,7 +61,7 @@ class ApprobationController extends AbstractActionController
     	$select = ReportRow::getTable()->getSelect();
     	$select->order(array($major.' '.$dir, 'expense_date DESC'))
 	    	->join('md_agent', 'expense_report_row.owner_id = md_agent.id', array(), 'left')
-	    	->join('contact_vcard', 'md_agent.contact_id = contact_vcard.id', array('agent_n_fn' => 'n_fn'), 'left')
+	    	->join('core_vcard', 'md_agent.contact_id = core_vcard.id', array('agent_n_fn' => 'n_fn'), 'left')
 	    	->join('core_link', 'expense_report_row.document_id = core_link.id', array('name'), 'left')
 	    	->where->in('expense_report_row.org_unit_id', $subSelect);
 
