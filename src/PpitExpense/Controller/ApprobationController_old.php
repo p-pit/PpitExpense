@@ -13,7 +13,7 @@ use Zend\Session\Container;
 use Zend\View\Model\ViewModel;
 use Zend\Mvc\Controller\AbstractActionController;
 
-class ApprobationController extends AbstractActionController
+class ApprobationController_old extends AbstractActionController
 {	    
     public function indexAction()
     {

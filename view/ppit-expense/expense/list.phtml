@@ -1,0 +1,84 @@
+<table class="table table-striped ppit_index">
+	<tr>
+		<th>&nbsp;</th>
+
+<?php $first = true; foreach ($context->getConfig('expense/list') as $propertyId => $rendering) : ?>
+		<th align="center">
+	<?php $label = $context->getConfig('expense')['properties'][$propertyId]['labels'][$context->getLocale()] ?>
+	<?php if ($label) : ?>
+			<button type="button" class="btn btn-default btn-xs ppit-sort-anchor" id="<?php echo $propertyId ?>-anchor">
+				<span><?php echo $label ?></span>
+<?php if ($major == $propertyId) : ?>
+				<span class="glyphicon glyphicon-triangle-<?php echo ($dir == 'ASC') ? 'top' : 'bottom' ?>"></span>
+<?php endif ?>
+			</button>
+		<?php if ($first && $context->isDemoModeActive()) : ?>
+			<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['expense/list/ordering'][$context->getLocale()] ?>">
+			    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+			</a>
+		<?php $first=false; endif;?>
+	<?php endif;?>
+		</th>
+<?php endforeach;?>
+
+		<th>&nbsp;</th>
+	<tr>
+		<td style="text-align: center">
+			<button type="button" class="btn btn-default index-btn expense-detail-anchor" title="<?php echo $this->translate('Add', 'ppit-core', $context->getLocale())?>" id="expense-detail-anchor_0">
+				<span class="glyphicon glyphicon-plus" id="add-glyphicon"></span>
+			</button>
+		</td>
+
+	<?php $total=0; foreach($expenses as $expense) $total += $expense->tax_inclusive; ?>
+		<td colspan="<?php echo count($context->getConfig('expense/list')) ?>" style="text-align: right; font-weight: bold; <?php if ($mode == 'todo' && $total > 0) echo  'color: red;' ?>">
+			<?php echo $this->translate('Total', 'ppit-core', $context->getLocale()) ?>: 
+			<?php echo $context->formatFloat($total, 2) ?>
+		</td>		
+		<td>&nbsp;</td>
+	</tr>
+
+<?php $i = 0; foreach ($expenses as $expense) : ?>
+	
+	<tr class="expense">
+	
+		<td style="text-align: center">
+			<button type="button" class="btn btn-default index-btn expense-detail-anchor" title="<?php echo $this->translate('Detail', 'ppit-core', $context->getLocale())?>" id="expense-detail-anchor_<?php echo $expense->id ?>">
+				<span class="glyphicon glyphicon-zoom-in" id="<?php echo $expense->id ?>-glyphicon"></span>
+			</button>
+<?php if ($i == 0 && $context->isDemoModeActive()) : ?>
+			<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['expense/list/detail'][$context->getLocale()] ?>">
+			    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+			</a>
+<?php endif;?>
+		</td>
+
+	<?php foreach ($context->getConfig('expense/list') as $propertyId => $rendering) : ?>
+	
+		<?php if ($rendering == 'date') : ?>
+		<td><?php echo $context->decodeDate($expense->properties[$propertyId]) ?></td>
+
+		<?php elseif ($rendering == 'number') : ?>
+		<td style="text-align: right"><?php echo $context->formatFloat($expense->properties[$propertyId], 2) ?></td>
+
+		<?php elseif ($rendering =='select') : ?>
+			<?php $property = $context->getConfig('expense')['properties'][$propertyId] ?>
+		<td><?php echo $property['modalities'][$expense->properties[$propertyId]][$context->getLocale()] ?></td>
+
+		<?php else : ?>
+		<td><?php echo $expense->properties[$propertyId] ?></td>
+
+		<?php endif;?>
+		
+	<?php endforeach;?>
+	
+		<td>
+	<?php if ($expense->document) : ?>
+			<?php $dropbox = $context->getConfig('ppitDocument')['dropbox'] ?>
+			<a class="glyphicon glyphicon-paperclip" href="<?php echo $dropbox['root'].$dropbox['folders']['expenses'].'/'.$expense->document ?>" title="<?php echo $this->translate('Attachment', 'ppit-document', $context->getLocale()) ?>" target=".blank" />
+	<?php endif;?>
+		</td>
+	</tr>
+	
+<?php $i++; endforeach; ?>
+
+</table>

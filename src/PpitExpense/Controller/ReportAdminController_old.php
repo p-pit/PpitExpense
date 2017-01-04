@@ -22,7 +22,7 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
 
-class ReportAdminController extends AbstractActionController
+class ReportAdminController_old extends AbstractActionController
 {
     public function subscribeAction()
     {

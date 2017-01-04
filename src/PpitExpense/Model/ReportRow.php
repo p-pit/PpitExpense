@@ -15,7 +15,6 @@ class ReportRow implements InputFilterAwareInterface
     public $owner_id;
     public $org_unit_id;
     public $approver_id;
-    public $period;
     public $expense_date;
     public $issue_date;
     public $approval_date;
@@ -26,31 +25,17 @@ class ReportRow implements InputFilterAwareInterface
     public $justification;
     public $horsepower;
     public $quantity;
-    public $document_id;
-    public $including_vat_amount;
-    public $vat_rate_1;
-    public $amount_vat_1;
-    public $vat_rate_2;
-    public $amount_vat_2;
+    public $document;
+    public $tax_inclusive;
+    public $tax_amount;
     public $capped_amount;
     public $audit;
+    public $update_time;
     
-    // Additional fields
-    public $org_unit_caption;
-    public $agent_n_fn;
-    public $approver_n_fn;
-	public $document_name;
-	public $currency;
-	public $exempted_amount;
-	public $vat_1;
-	public $vat_2;
-	public $before_vat_mount;
-	public $name;
-
 	// Transient fields
-	public $period_caption;
 	public $horsepowers;
 	public $mileageScales;
+	public $properties;
 
     // Static fields
     public static $periodCaptions = array(
@@ -71,7 +56,6 @@ class ReportRow implements InputFilterAwareInterface
         $this->owner_id = (isset($data['owner_id'])) ? $data['owner_id'] : null;
         $this->org_unit_id = (isset($data['org_unit_id'])) ? $data['org_unit_id'] : null;
         $this->approver_id = (isset($data['approver_id'])) ? $data['approver_id'] : null;
-        $this->period = (isset($data['period'])) ? $data['period'] : null;
         $this->expense_date = (isset($data['expense_date'])) ? $data['expense_date'] : null;
         $this->issue_date = (isset($data['issue_date'])) ? $data['issue_date'] : null;
         $this->approval_date = (isset($data['approval_date'])) ? $data['approval_date'] : null;
@@ -82,26 +66,11 @@ class ReportRow implements InputFilterAwareInterface
         $this->justification = (isset($data['justification'])) ? $data['justification'] : null;
         $this->horsepower = (isset($data['horsepower'])) ? $data['horsepower'] : null;
         $this->quantity = (isset($data['quantity'])) ? $data['quantity'] : null;
-        $this->document_id = (isset($data['document_id'])) ? $data['document_id'] : null;
-        $this->including_vat_amount = (isset($data['including_vat_amount'])) ? $data['including_vat_amount'] : null;
-        $this->vat_rate_1 = (isset($data['vat_rate_1'])) ? $data['vat_rate_1'] : null;
-        $this->amount_vat_1 = (isset($data['amount_vat_1'])) ? $data['amount_vat_1'] : null;
-        $this->vat_rate_2 = (isset($data['vat_rate_2'])) ? $data['vat_rate_2'] : null;
-        $this->amount_vat_2 = (isset($data['amount_vat_2'])) ? $data['amount_vat_2'] : null;
+        $this->document = (isset($data['document'])) ? $data['document'] : null;
+        $this->tax_inclusive = (isset($data['tax_inclusive'])) ? $data['tax_inclusive'] : null;
+        $this->tax_amount = (isset($data['tax_amount'])) ? $data['tax_amount'] : null;
         $this->capped_amount = (isset($data['capped_amount'])) ? $data['capped_amount'] : null;
-        $this->audit = (isset($data['audit'])) ? ((json_decode($data['audit'])) ? json_decode($data['audit']) : array()) : null;
-        
-    	// Joined table columns and computed values
-        $this->org_unit_caption = (isset($data['org_unit_caption'])) ? $data['org_unit_caption'] : null;
-        $this->agent_n_fn = (isset($data['agent_n_fn'])) ? $data['agent_n_fn'] : null;
-        $this->approver_n_fn = (isset($data['approver_n_fn'])) ? $data['approver_n_fn'] : null;
-        $this->document_name = (isset($data['document_name'])) ? $data['document_name'] : null;
-        $this->currency = '€';
-        $this->exempted_amount = (isset($data['exempted_amount'])) ? $data['exempted_amount'] : null;
-        $this->vat_1 = (isset($data['vat_1'])) ? $data['vat_1'] : null;
-        $this->vat_2 = (isset($data['vat_2'])) ? $data['vat_2'] : null;
-        $this->before_vat_amount = (isset($data['before_vat_amount'])) ? $data['before_vat_amount'] : null;
-        $this->name = (isset($data['name'])) ? $data['name'] : null;
+        $this->audit = (isset($data['audit'])) ? json_decode($data['audit'], true) : null;
     }
 
     public function toArray()
@@ -111,7 +80,6 @@ class ReportRow implements InputFilterAwareInterface
     	$data['owner_id'] = (int) $this->owner_id;
     	$data['org_unit_id'] = (int) $this->org_unit_id;
     	$data['approver_id'] = (int) $this->approver_id;
-    	$data['period'] = $this->period;
     	$data['expense_date'] = $this->expense_date;
     	$data['issue_date'] = ($this->issue_date) ? $this->issue_date : null;
     	$data['approval_date'] = ($this->approval_date) ? $this->approval_date : null;
@@ -122,31 +90,132 @@ class ReportRow implements InputFilterAwareInterface
     	$data['justification'] = $this->justification;
     	$data['horsepower'] = $this->horsepower;
     	$data['quantity'] = $this->quantity;
-    	$data['document_id'] = $this->document_id;
-    	$data['including_vat_amount'] = (float) $this->including_vat_amount;
-		$data['vat_rate_1'] = (float) $this->vat_rate_1;
-    	$data['amount_vat_1'] = (float) $this->amount_vat_1;
-    	$data['vat_rate_2'] = (float) $this->vat_rate_2;
-    	$data['amount_vat_2'] = (float) $this->amount_vat_2;
-    	$data['capped_amount'] = (float) $this->capped_amount;
-    	if ($this->audit) {
-	    	$data['audit'] = json_encode($this->audit);
-	    	$this->audit = json_decode($data['audit']);
+    	$data['document'] = $this->document;
+    	$data['tax_inclusive'] = $this->tax_inclusive;
+    	$data['tax_amount'] = $this->tax_amount;
+    	$data['capped_amount'] = $this->capped_amount;
+    	$data['audit'] = json_encode($this->audit);
+    	$data['update_time'] = $this->update_time;
+    	return $data;
+    }
+
+    public static function getList($params, $major, $dir, $mode = 'todo')
+    {
+    	$context = Context::getCurrent();
+    
+    	$select = ReportRow::getTable()->getSelect()
+	    	->order(array($major.' '.$dir, 'expense_date', 'tax_inclusive DESC'));
+    	$where = new Where;
+    	$where->notEqualTo('expense_report_row.status', 'deleted');
+    
+    	// Todo list vs search modes
+    	if ($mode == 'todo') {
+    		$where->notEqualTo('expense_report_row.status', 'recorded');
     	}
-    	else $data['audit'] = '';
-       	return $data;
+    	else {
+    		// Set the filters
+    		foreach ($params as $propertyId => $property) {
+				if (substr($propertyId, 0, 4) == 'min_') $where->greaterThanOrEqualTo('expense_report_row.'.substr($propertyId, 4), $params[$propertyId]);
+    			elseif (substr($propertyId, 0, 4) == 'max_') $where->lessThanOrEqualTo('expense_report_row.'.substr($propertyId, 4), $params[$propertyId]);
+    			else $where->like('expense_report_row.'.$propertyId, '%'.$params[$propertyId].'%');
+    		}
+    	}
+    	$select->where($where);
+    	$cursor = ReportRow::getTable()->selectWith($select);
+    	$expenses = array();
+    
+    	foreach ($cursor as $expense) {
+    		$expense->properties = $expense->toArray('flat');
+    		$expenses[] = $expense;
+    	}
+    	return $expenses;
+    }
+    
+    public static function get($id, $column = 'id')
+    {
+    	$expense = ReportRow::getTable()->get($id, $column);
+    	if (!$expense) return null;
+    	$expense->properties = $expense->toArray('flat');
+    	return $expense;
+    }
+    
+    public static function instanciate()
+    {
+    	$expense = new ReportRow;
+    	$expense->status = 'new';
+    	$expense->audit = array();
+    	return $expense;
+    }
+    
+    public function loadData($data) {
+    
+    	$context = Context::getCurrent();
+    
+    	if (array_key_exists('status', $data)) {
+    		$this->status = trim(strip_tags($data['status']));
+    		if (!$this->status || strlen($this->status) > 255) return 'Integrity';
+    	}
+    	if (array_key_exists('owner_id', $data)) $this->owner_id = (int) $data['owner_id'];
+    	if (array_key_exists('org_unit_id', $data)) $this->org_unit_id = (int) $data['org_unit_id'];
+    	if (array_key_exists('approver_id', $data)) $this->approver_id = (int) $data['approver_id'];
+    	if (array_key_exists('expense_date', $data)) {
+    		$this->expense_date = trim(strip_tags($data['expense_date']));
+    		if ($this->expense_date && !checkdate(substr($this->expense_date, 5, 2), substr($this->expense_date, 8, 2), substr($this->expense_date, 0, 4))) return 'Integrity';
+    	}
+    	if (array_key_exists('approval_date', $data)) {
+    		$this->approval_date = trim(strip_tags($data['approval_date']));
+    		if ($this->approval_date && !checkdate(substr($this->approval_date, 5, 2), substr($this->approval_date, 8, 2), substr($this->approval_date, 0, 4))) return 'Integrity';
+    	}
+        if (array_key_exists('registration_date', $data)) {
+    		$this->registration_date = trim(strip_tags($data['registration_date']));
+    		if ($this->registration_date && !checkdate(substr($this->registration_date, 5, 2), substr($this->registration_date, 8, 2), substr($this->registration_date, 0, 4))) return 'Integrity';
+    	}
+        if (array_key_exists('category', $data)) {
+    		$this->category = trim(strip_tags($data['category']));
+    		if (!$this->category || strlen($this->category) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('destination', $data)) {
+    		$this->destination = trim(strip_tags($data['destination']));
+    		if (strlen($this->destination) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('justification', $data)) {
+    		$this->justification = trim(strip_tags($data['justification']));
+    		if (strlen($this->justification) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('horsepower', $data)) {
+    		$this->horsepower = trim(strip_tags($data['horsepower']));
+    		if (strlen($this->horsepower) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('quantity', $data)) $this->quantity = (float) $data['quantity'];
+        if (array_key_exists('document', $data)) {
+    		$this->document = trim(strip_tags($data['document']));
+    		if (strlen($this->document) > 255) return 'Integrity';
+    	}
+        if (array_key_exists('tax_inclusive', $data)) $this->tax_inclusive = (float) $data['tax_inclusive'];
+        if (array_key_exists('tax_amount', $data)) $this->tax_amount = (float) $data['tax_amount'];
+        if (array_key_exists('capped_amount', $data)) $this->capped_amount = (float) $data['capped_amount'];
+        if (array_key_exists('update_time', $data)) $this->update_time = $data['update_time'];
+    	$this->properties = $this->toArray();
+    
+    	// Update the audit
+    	$this->audit[] = array(
+    			'time' => Date('Y-m-d G:i:s'),
+    			'n_fn' => $context->getFormatedName(),
+    	);
+    
+    	return 'OK';
     }
 
     public function retrieveMileageProperties($year)
     {
     	$context = Context::getCurrent();
     	if (!$this->owner_id) $this->owner_id = $context->getContactId();
-//    	if (!$this->org_unit_id) $this->org_unit_id = $context->getOrgUnitId();
-
+    	//    	if (!$this->org_unit_id) $this->org_unit_id = $context->getOrgUnitId();
+    
     	// Store the mileage scale in a 2-dim array
     	$select = MileageScale::getTable()->getSelect()
-    		->where(array('year' => $year, 'category' => 'Mileage allowance'))
-    		->order(array('horsepower', 'annual_stage'));
+    	->where(array('year' => $year, 'category' => 'Mileage allowance'))
+    	->order(array('horsepower', 'annual_stage'));
     	$ms_cursor = MileageScale::getTable()->selectWith($select);
     	$mileageScales = array();
     	$this->horsepowers = array();
@@ -156,15 +225,15 @@ class ReportRow implements InputFilterAwareInterface
     			$horsepower = $scale->horsepower;
     			$this->horsepowers[] = $horsepower;
     			$mileageScales[$horsepower] = array();
-				$stages = array();
-				$sum = 0;
+    			$stages = array();
+    			$sum = 0;
     		}
     		$sum += $scale->annual_stage;
     		$stages[] = $sum;
     		$scale->annual_sum = 0;
-			$mileageScales[$horsepower][$sum] = $scale;
-		}
-
+    		$mileageScales[$horsepower][$sum] = $scale;
+    	}
+    
     	// Retrieve the annual cumul for the agent
     	$select = ReportRow::getTable()->getSelect();
     	$where = new Where();
@@ -174,10 +243,10 @@ class ReportRow implements InputFilterAwareInterface
     	$select->where($where);
     	$rr_cursor = ReportRow::getTable()->selectWith($select);
     	$annual_sum = 0;
-		$i = 0;
+    	$i = 0;
     	$currentStage = $stages[$i];
-	    foreach ($rr_cursor as $row) {
-	    	$scale = $mileageScales[$row->horsepower][$currentStage];
+    	foreach ($rr_cursor as $row) {
+    		$scale = $mileageScales[$row->horsepower][$currentStage];
     		if ($annual_sum + $row->quantity > $currentStage) {
     			$firstBracket = $currentStage - $annual_sum;
     			$row->quantity -= $firstBracket;
@@ -186,9 +255,9 @@ class ReportRow implements InputFilterAwareInterface
     			if ($this->id == $row->id) {
     				$this->capped_amount += $firstBracket * $scale->variable_scale;
     			}
-
-   			 	$currentStage = $stages[++$i];
-	    		$scale = $mileageScales[$row->horsepower][$currentStage];
+    
+    			$currentStage = $stages[++$i];
+    			$scale = $mileageScales[$row->horsepower][$currentStage];
     		}
     		$annual_sum += $row->quantity;
     		$scale->annual_sum += $row->quantity;
@@ -199,28 +268,65 @@ class ReportRow implements InputFilterAwareInterface
     	$this->mileageScales = $mileageScales;
     	$this->including_vat_amount = $this->capped_amount;
     }
-
+    
     public function loadMileageData($request) {
-	    $this->expense_date = $request->getPost('expense_date');
+    	$this->expense_date = $request->getPost('expense_date');
     	$this->horsepower = $request->getPost('horsepower');
     	$this->quantity = (float) $request->getPost('quantity');
     	$this->destination = $request->getPost('destination');
     	$this->justification = $request->getPost('justification');
-    	 
+    
     	if (!$this->expense_date
-    	||	!$this->horsepower
-    	||	!$this->quantity
-    	||	!$this->destination
-    	||	!$this->justification) {
-    		throw new \Exception('View error');
-    	}
-
-    	$this->owner_id = $context->getAgentId();
-	    $this->org_unit_id = $context->getOrgUnitId();
-	    $this->status = 'Submitted';
-	    $this->category = 'Mileage allowance';
-	    $this->period = date('Y-m');
-	    $this->expense_date = date('Y-m-d');
+    			||	!$this->horsepower
+    			||	!$this->quantity
+    			||	!$this->destination
+    			||	!$this->justification) {
+    				throw new \Exception('View error');
+    			}
+    
+    			$this->owner_id = $context->getAgentId();
+    			$this->org_unit_id = $context->getOrgUnitId();
+    			$this->status = 'Submitted';
+    			$this->category = 'Mileage allowance';
+    			$this->period = date('Y-m');
+    			$this->expense_date = date('Y-m-d');
+    }
+    
+    public function add()
+    {
+    	$context = Context::getCurrent();
+    	$this->id = null;
+    	ReportRow::getTable()->save($this);
+    	return ('OK');
+    }
+    
+    public function update($update_time)
+    {
+    	$context = Context::getCurrent();
+    	$expense = ReportRow::get($this->id);
+    
+    	// Isolation check
+    	if ($update_time && $expense->update_time > $update_time) return 'Isolation';
+    	ReportRow::getTable()->save($this);
+    	return 'OK';
+    }
+    
+    public function isDeletable()
+    {
+    	return true;
+    }
+    
+    public function delete($update_time)
+    {
+    	$context = Context::getCurrent();
+    	$expense = ReportRow::get($this->id);
+    
+    	// Isolation check
+    	if ($update_time && $expense->update_time > $update_time) return 'Isolation';
+    	$this->status = 'deleted';
+    	ReportRow::getTable()->save($this);
+    
+    	return 'OK';
     }
 
     public function setInputFilter(InputFilterInterface $inputFilter)

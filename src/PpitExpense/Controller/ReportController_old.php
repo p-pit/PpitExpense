@@ -16,7 +16,7 @@ use Zend\View\Resolver;
 use DOMPDFModule\View\Model\PdfModel;
 use Zend\Mvc\Controller\AbstractActionController;
 
-class ReportController extends AbstractActionController
+class ReportController_old extends AbstractActionController
 {
    	public function indexAction()
    	{

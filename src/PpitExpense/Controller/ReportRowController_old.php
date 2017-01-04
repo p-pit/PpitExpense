@@ -15,7 +15,7 @@ use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\PhpRenderer;
 use Zend\View\Resolver;
 
-class ReportRowController extends AbstractActionController
+class ReportRowController_old extends AbstractActionController
 {
    	public function indexAction()
     {

@@ -4,10 +4,7 @@ namespace PpitExpense;
 return array(
     'controllers' => array(
         'invokables' => array(
-        	'PpitExpense\Controller\Approbation' => 'PpitExpense\Controller\ApprobationController',
-        	'PpitExpense\Controller\Report' => 'PpitExpense\Controller\ReportController',
-        	'PpitExpense\Controller\ReportRow' => 'PpitExpense\Controller\ReportRowController',
-        	'PpitExpense\Controller\ReportAdmin' => 'PpitExpense\Controller\ReportAdminController',
+        	'PpitExpense\Controller\Expense' => 'PpitExpense\Controller\ExpenseController',
         ),
     ),
 
@@ -18,7 +15,7 @@ return array(
 				'options' => array(
 					'route'    => '/',
 					'defaults' => array(
-						'controller' => 'PpitExpense\Controller\ReportRow',
+						'controller' => 'PpitExpense\Controller\Expense',
 						'action'     => 'index',
 					),
 				),
@@ -35,237 +32,78 @@ return array(
 					),
 				),
 			),
-			'report' => array(
-				'type'    => 'literal',
-				'options' => array(
-					'route'    => '/report',
-					'defaults' => array(
-						'controller' => 'PpitExpense\Controller\Report',
-						'action'     => 'index',
-					),
-				),
-				'may_terminate' => true,
-				'child_routes' => array(
-					'index' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/index',
-							'defaults' => array(
-								'action' => 'index',
-							),
-						),
-					),
-					'detail' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/detail[/:period][/:owner_id]',
-							'defaults' => array(
-								'action' => 'detail',
-							),
-						),
-					),
-					'todo' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/todo',
-							'defaults' => array(
-								'action' => 'todo',
-							),
-						),
-					),
-					'register' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/register[/:id]',
-							'constraints' => array(
-								'id'     => '[0-9]*',
-							),
-							'defaults' => array(
-								'action' => 'register',
-							),
-						),
-					),
-					'export' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/export',
-							'defaults' => array(
-								'action' => 'export',
-							),
-						),
-					),
-				),
-			),
-			'reportRow' => array(
-				'type'    => 'literal',
-				'options' => array(
-					'route'    => '/report-row',
-					'defaults' => array(
-						'controller' => 'PpitExpense\Controller\ReportRow',
-						'action'     => 'index',
-					),
-				),
-				'may_terminate' => true,
-				'child_routes' => array(
-					'index' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/index',
-							'defaults' => array(
-								'action' => 'index',
-							),
-						),
-					),
-					'detail' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/detail[/:id]',
-							'constraints' => array(
-								'id'     => '[0-9]*',
-							),
-							'defaults' => array(
-								'action' => 'detail',
-							),
-						),
-					),
-					'add' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/add[/:id]',
-							'constraints' => array(
-								'id'     => '[0-9]*',
-							),
-							'defaults' => array(
-								'action' => 'add',
-							),
-						),
-					),
-					'mileage' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/mileage[/:id]',
-							'constraints' => array(
-								'id'     => '[0-9]*',
-							),
-							'defaults' => array(
-								'action' => 'mileage',
-							),
-						),
-					),
-					'update' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/update[/:id]',
-							'constraints' => array(
-								'id'     => '[0-9]*',
-							),
-							'defaults' => array(
-								'action' => 'update',
-							),
-						),
-					),
-					'delete' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/delete[/:id]',
-							'constraints' => array(
-								'id'     => '[0-9]*',
-							),
-							'defaults' => array(
-								'action' => 'delete',
-							),
-						),
-					),
-				),
-			),
-			'approbation' => array(
-				'type'    => 'literal',
-				'options' => array(
-					'route'    => '/approbation',
-					'defaults' => array(
-						'controller' => 'PpitExpense\Controller\Approbation',
-						'action'     => 'index',
-					),
-				),
-				'may_terminate' => true,
-				'child_routes' => array(
-					'index' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/index',
-							'defaults' => array(
-								'action' => 'index',
-							),
-						),
-					),
-					'todo' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/todo',
-							'defaults' => array(
-								'action' => 'todo',
-							),
-						),
-					),
-					'approbe' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/approbe[/:id]',
-							'constraints' => array(
-								'id'     => '[0-9]*',
-							),
-							'defaults' => array(
-								'action' => 'approbe',
-							),
-						),
-					),
-					'register' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/register[/:id]',
-							'constraints' => array(
-								'id'     => '[0-9]*',
-							),
-							'defaults' => array(
-								'action' => 'register',
-							),
-						),
-					),
-				),
-			),
-			'reportAdmin' => array(
-				'type'    => 'literal',
-				'options' => array(
-					'route'    => '/report-admin',
-					'defaults' => array(
-						'controller' => 'PpitExpense\Controller\ReportAdmin',
-						'action'     => 'subscribe',
-					),
-				),
-				'may_terminate' => true,
-				'child_routes' => array(
-					'subscribe' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/subscribe',
-							'defaults' => array(
-								'action' => 'subscribe',
-							),
-						),
-					),
-	       			'initpassword' => array(
-	                    'type' => 'segment',
-	                    'options' => array(
-	                        'route' => '/initpassword[/:id]',
-		                    'constraints' => array(
-		                    	'id'     => '[0-9]*',
-		                    ),
-	                    	'defaults' => array(
-	                            'action' => 'initpassword',
-	                        ),
-	                    ),
-	                ),
-				),
+        	'expense' => array(
+                'type'    => 'literal',
+                'options' => array(
+                    'route'    => '/expense',
+                    'defaults' => array(
+                        'controller' => 'PpitExpense\Controller\Expense',
+                        'action'     => 'index',
+                    ),
+                ),
+           		'may_terminate' => true,
+	       		'child_routes' => array(
+        						'index' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/index',
+        										'defaults' => array(
+        												'action' => 'index',
+        										),
+        								),
+        						),
+        						'search' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/search',
+        										'defaults' => array(
+        												'action' => 'search',
+        										),
+        								),
+        						),
+        						'list' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/list',
+        										'defaults' => array(
+        												'action' => 'list',
+        										),
+        								),
+        						),
+        						'export' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/export',
+        										'defaults' => array(
+        												'action' => 'export',
+        										),
+        								),
+        						),
+	       						'detail' => array(
+        								'type' => 'segment',
+        								'options' => array(
+        										'route' => '/detail[/:id]',
+        										'constraints' => array(
+        												'id' => '[0-9]*',
+        										),
+        										'defaults' => array(
+        												'action' => 'detail',
+        										),
+        								),
+        						),
+		        				'update' => array(
+		        						'type' => 'segment',
+		        						'options' => array(
+		        								'route' => '/update[/:id][/:act]',
+		        								'constraints' => array(
+		        										'id'     => '[0-9]*',
+		        								),
+		        								'defaults' => array(
+		        										'action' => 'update',
+		        								),
+		        						),
+		        				),
+	       		),
 			),
 		),
 	),
@@ -276,30 +114,16 @@ return array(
 			'BjyAuthorize\Guard\Route' => array(
 
 				// Reports
-				array('route' => 'report', 'roles' => array('accountant')),
-				array('route' => 'report/index', 'roles' => array('accountant')),
-				array('route' => 'report/detail', 'roles' => array('accountant')),
-				array('route' => 'report/todo', 'roles' => array('accountant')),
-				array('route' => 'report/register', 'roles' => array('accountant')),
-				array('route' => 'report/export', 'roles' => array('accountant')),
-
-				array('route' => 'reportRow', 'roles' => array('user')),
-				array('route' => 'reportRow/index', 'roles' => array('user')),
-				array('route' => 'reportRow/detail', 'roles' => array('user')),
-				array('route' => 'reportRow/add', 'roles' => array('user')),
-				array('route' => 'reportRow/mileage', 'roles' => array('user')),
-				array('route' => 'reportRow/update', 'roles' => array('user')),
-				array('route' => 'reportRow/delete', 'roles' => array('user')),
-				array('route' => 'reportRow/export', 'roles' => array('accountant')),
-						
-				array('route' => 'approbation', 'roles' => array('approver')),
-				array('route' => 'approbation/index', 'roles' => array('approver')),
-				array('route' => 'approbation/todo', 'roles' => array('approver')),
-				array('route' => 'approbation/approbe', 'roles' => array('approver')),
-				array('route' => 'approbation/register', 'roles' => array('accountant')),
-
-				array('route' => 'reportAdmin/subscribe', 'roles' => array('guest')),
-				array('route' => 'reportAdmin/initpassword', 'roles' => array('guest')),
+				array('route' => 'expense', 'roles' => array('user')),
+				array('route' => 'expense/index', 'roles' => array('user')),
+				array('route' => 'expense/search', 'roles' => array('user')),
+				array('route' => 'expense/list', 'roles' => array('user')),
+				array('route' => 'expense/detail', 'roles' => array('user')),
+				array('route' => 'expense/add', 'roles' => array('user')),
+				array('route' => 'expense/mileage', 'roles' => array('user')),
+				array('route' => 'expense/update', 'roles' => array('user')),
+				array('route' => 'expense/delete', 'roles' => array('user')),
+				array('route' => 'expense/export', 'roles' => array('accountant')),
 			)
 		)
 	),
@@ -385,7 +209,188 @@ return array(
 					),
 			),
 	),
-	'reportRow/index' => array(
-			'title' => array('en_US' => 'P-PIT Expense report', 'fr_FR' => 'P-PIT Notes de frais'),
+	
+	'expense' => array(
+			'statuses' => array(),
+			'properties' => array(
+					'status' => array(
+							'type' => 'select',
+							'modalities' => array(
+									'new' => array('fr_FR' => 'Nouveau', 'en_US' => 'New'),
+									'approved' => array('fr_FR' => 'Validé', 'en_US' => 'Approved'),
+									'registered' => array('fr_FR' => 'Comptabilisé', 'en_US' => 'Registered'),
+							),
+							'labels' => array(
+									'en_US' => 'Status',
+									'fr_FR' => 'Statut',
+							),
+					),
+					'expense_date' => array(
+							'type' => 'date',
+							'labels' => array(
+									'en_US' => 'Expense date',
+									'fr_FR' => 'Date dépense',
+							),
+					),
+					'approval_date' => array(
+							'type' => 'date',
+							'labels' => array(
+									'en_US' => 'Approval date',
+									'fr_FR' => 'Date validation',
+							),
+					),
+					'registration_date' => array(
+							'type' => 'date',
+							'labels' => array(
+									'en_US' => 'Registration date',
+									'fr_FR' => 'Date enregistrement',
+							),
+					),
+					'category' => array(
+							'type' => 'select',
+							'modalities' => array(
+									'transport' => array('fr_FR' => 'Transport', 'en_US' => 'Transport'),
+									'meal' => array('fr_FR' => 'Repas', 'en_US' => 'Meal'),
+									'phone' => array('fr_FR' => 'Téléphone', 'en_US' => 'Phone'),
+									'mail' => array('fr_FR' => 'Courrier', 'en_US' => 'Mail'),
+									'office' => array('fr_FR' => 'Bureautique', 'en_US' => 'Office'),
+									'library' => array('fr_FR' => 'Librairie', 'en_US' => 'Library'),
+									'invitation' => array('fr_FR' => 'Invitation', 'en_US' => 'Invitation'),
+									'gift' => array('fr_FR' => 'Cadeau', 'en_US' => 'Gift'),
+									'miscellaneous' => array('fr_FR' => 'Divers', 'en_US' => 'Miscellaneous'),
+							),
+							'labels' => array(
+									'en_US' => 'Category',
+									'fr_FR' => 'Categorie',
+							),
+					),
+					'tax_inclusive' => array(
+							'type' => 'number',
+							'minValue' => 0,
+							'maxValue' => 99999999,
+							'labels' => array(
+									'en_US' => 'Tax inclusive',
+									'fr_FR' => 'Montant TTC',
+							),
+					),
+					'tax_amount' => array(
+							'type' => 'number',
+							'minValue' => 0,
+							'maxValue' => 99999999,
+							'labels' => array(
+									'en_US' => 'Tax amount',
+									'fr_FR' => 'Montant TVA',
+							),
+					),
+					'capped_amount' => array(
+							'type' => 'number',
+							'minValue' => 0,
+							'maxValue' => 99999999,
+							'labels' => array(
+									'en_US' => 'Capped amount',
+									'fr_FR' => 'Montant plafonné',
+							),
+					),
+					'document' => array(
+							'type' => 'dropbox',
+							'labels' => array(
+									'en_US' => 'Attachment',
+									'fr_FR' => 'Justificatif',
+							),
+					),
+			),
+	),
+	'expense/index' => array(
+			'title' => array('en_US' => 'P-PIT Finance', 'fr_FR' => 'P-PIT Finance'),
+	),
+	'expense/search' => array(
+			'title' => array('en_US' => 'Expenses', 'fr_FR' => 'Dépenses'),
+			'todoTitle' => array('en_US' => 'todo list', 'fr_FR' => 'todo list'),
+			'main' => array(
+				'expense_date' => 'date',
+				'status' => 'select',
+				'category' => 'select',
+				'tax_inclusive' => 'range',
+			),
+	),
+	'expense/list' => array(
+			'expense_date' => 'date',
+			'status' => 'select',
+			'category' => 'select',
+			'tax_inclusive' => 'number',
+	),
+	'expense/detail' => array(
+			'title' => array('en_US' => 'Expense detail', 'fr_FR' => 'Détail de la dépense'),
+			'displayAudit' => true,
+	),
+	'expense/update' => array(
+			'status' => array('mandatory' => true),
+			'expense_date' => array('mandatory' => false),
+			'approval_date' => array('mandatory' => false),
+			'registration_date' => array('mandatory' => false),
+			'category' => array('mandatory' => true),
+			'tax_inclusive' => array('mandatory' => true),
+			'tax_amount' => array('mandatory' => false),
+			'document' => array('mandatory' => false),
+	),
+
+	'demo' => array(
+			'expense/search/title' => array(
+					'en_US' => '
+<h4>Term list</h4>
+<p>As a default, all the current expenses (to be registered) are presented in the list.</p>
+<p>As soon as a criterion below is specified, the list switch in search mode.</p>
+',
+					'fr_FR' => '
+<h4>Liste des dépenses</h4>
+<p>Par défaut, toutes les dépenses en cours (à comptabiliser) sont présentées dans la liste.</p>
+<p>Dès lors qu\'un des critères ci-dessous est spécifié, le mode de recherche est automatiquement activé.</p>
+',
+			),
+			'expense/search/x' => array(
+					'en_US' => '
+<h4>Return in default mode</h4>
+<p>The <code>x</code> button reinitializes all the search criteria and reset the list filtered on current expenses.</p>
+',
+					'fr_FR' => '
+<h4>Retour au mode par défaut</h4>
+<p>Le bouton <code>x</code> réinitialise tous les critères de recherche et ré-affiche la liste filtrée sur les dépenses en cours.</p>
+',
+			),
+			'expense/search/export' => array(
+					'en_US' => '
+<h4>List export</h4>
+<p>The list can be exported to Excel as it is presented: defaulting list or list resulting of a multi-criteria search.</p>
+',
+					'fr_FR' => '
+<h4>Export de la liste</h4>
+<p>La liste peut être exportée sous Excel telle que présentée : liste par défaut ou liste résultant d\'une recherche multi-critère.</p>
+',
+			),
+			'expense/list/ordering' => array(
+					'en_US' => '
+<h4>Ordering</h4>
+<p>The list can be sorted according to each column in ascending or descending order.</p>
+',
+					'fr_FR' => '
+<h4>Classement</h4>
+<p>La liste peut être triée selon chaque colonne en ordre ascendant ou descendant.</p>
+',
+			),
+			'expense/list/detail' => array(
+					'en_US' => '',
+					'fr_FR' => '
+<h4>Détail d\'une dépense</h4>
+<p>Le bouton zoom permet d\'accéder au détail d\'une dépense.</p>
+					',
+			),
+			'expense/update' => array(
+					'en_US' => '',
+					'fr_FR' => '
+<h4>Gestion du statut et des attributs de la dépense</h4>
+<p>L\'accès au détail d\'une dépense permet de consulter et éventuellement en rectifier les données.</p>
+<p>Il permet également d\'en actualiser la statut et y associer une pièce jointe (ex. photo ou scan de facture).</p>
+					',
+			),
 	),
 );
