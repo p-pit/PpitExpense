@@ -1,0 +1,86 @@
+<?php if ($context->isDemoModeActive()) : ?>
+		<a class="tip" href="#" title="<?php echo $context->getConfig('demo')['expense/register'][$context->getLocale()] ?>">
+		    <img src="<?php echo $this->basePath('img/tip.png') ?>" width="20" />
+		</a>
+<?php endif;?>
+
+<!-- Form header -->
+<?php echo $this->partial('/partials/form-header', array(
+		'update_time' => $expense->update_time,
+		'message' => $message,
+		'error' => $error,
+		'csrfForm' => $csrfForm,
+		'context' => $context,
+));
+?>
+		<input type="hidden" id="expense_update_time" value="<?php echo $expense->update_time ?>" />
+
+	    <div class="form-group">
+			<div class="col-sm-5">&nbsp;</div>
+			<div class="col-sm-7">
+				<input name="submit" type="submit" id="up-submit-button" class="btn btn-warning" value="<?php echo $this->translate('Register', 'ppit-accounting', $context->getLocale()) ?>">
+			</div>
+		</div>
+
+<?php foreach ($context->getConfig('expense/update') as $propertyId => $options) : ?>
+	<?php 
+	$property = $context->getConfig('expense')['properties'][$propertyId];
+	if ($property['type'] == 'repository') $property = $context->getConfig($property['definition']);
+	?>
+		<div class="form-group" id="<?php echo (($property['type'] == 'date' || $property['type'] == 'number') ? 'input_' : '').$propertyId ?>_group">
+			<label class="col-sm-5 control-label">
+				<?php if ($options['mandatory']) echo '* ' ?><?php echo $property['labels'][$context->getLocale()] ?>
+	<?php if ($expense->document && $property['type'] == 'dropbox') : ?>
+				<?php $dropbox = $context->getConfig('ppitDocument')['dropbox'] ?>
+				<a class="glyphicon glyphicon-paperclip" href="<?php echo $dropbox['root'].$dropbox['folders']['expenses'].'/'.$expense->document ?>" title="<?php echo $this->translate('Attachment', 'ppit-document', $context->getLocale()) ?>" target=".blank"></a>
+	<?php endif;?>
+			</label>
+			<div class="col-sm-7">
+				
+	<?php if ($property['type'] == 'date') : ?>
+				<input type="hidden" id="<?php echo $propertyId ?>" name="<?php echo $propertyId ?>" />
+				<input class="form-control" id="input_<?php echo $propertyId ?>" name="input_<?php echo $propertyId ?>" value="<?php echo $context->decodeDate($expense->properties[$propertyId]) ?>" disabled="disabled" />
+
+	<?php elseif ($property['type'] == 'number') : ?>
+				<input type="hidden" id="<?php echo $propertyId ?>" name="<?php echo $propertyId ?>" />
+				<input class="form-control" id="input_<?php echo $propertyId ?>" name="input_<?php echo $propertyId ?>" value="<?php echo ($expense->properties[$propertyId]) ? $context->formatFloat($expense->properties[$propertyId], 2) : '' ?>" disabled="disabled" />
+
+	<?php elseif ($property['type'] == 'textarea') : ?>
+				<textarea class="form-control" id="<?php echo $propertyId ?>" name="<?php echo $propertyId ?>" disabled="disabled">
+					<?php echo $expense->properties[$propertyId] ?>
+				</textarea>>
+
+	<?php elseif ($property['type'] == 'select') : ?>
+				<select class="form-control" id="<?php echo $propertyId ?>" name="<?php echo $propertyId ?>" disabled="disabled">
+	    			<option />
+		<?php foreach ($property['modalities'] as $key => $labels) : ?>
+	    			<option value="<?php echo $key ?>" <?php if ($expense->properties[$propertyId] == $key) echo 'selected="selected"' ?>><?php echo $labels[$context->getLocale()] ?></option>
+		<?php endforeach;?>
+				</select>
+	
+	<?php elseif ($property['type'] == 'dropbox') : ?>
+				<select class="form-control" id="<?php echo $propertyId ?>" disabled="disabled">
+					<option />
+		<?php foreach ($documentList as $document) : ?>
+					<option value="<?php echo $document ?>" <?php if ($expense->document == $document) echo 'selected="selected"' ?>><?php echo $document ?></option>
+		<?php endforeach;?>
+				</select>
+	
+	<?php else : ?>
+				<input class="form-control" id="<?php echo $propertyId ?>" value="<?php echo $expense->properties[$propertyId] ?>" disabled="disabled" />
+
+	<?php endif;?>
+			</div>
+			<div class="col-sm-12"><p class="help-block" id="<?php echo (($property['type'] == 'date' || $property['type'] == 'number') ? 'input_' : '').$propertyId ?>_error"></p></div>
+		</div>
+
+<?php endforeach;?>
+
+		    <div class="form-group">
+				<div class="col-sm-5">&nbsp;</div>
+				<div class="col-sm-7">
+					<input name="submit" type="submit" id="submit-button" class="btn btn-warning" value="<?php echo $this->translate('Register', 'ppit-core', $context->getLocale()) ?>">
+				</div>
+			</div>
+		
+		</form>

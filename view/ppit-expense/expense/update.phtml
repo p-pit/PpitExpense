@@ -5,11 +5,11 @@
 <?php endif;?>
 
 <?php if ($expense->id && !$action && !$message) : ?>
-		<button type="button" class="btn btn-default action-btn" id="expense-update-anchor" title="<?php echo $this->translate('Update', 'ppit-core', $context->getLocale()) ?>">
+		<button type="button" class="btn btn-default action-btn" id="expense-update-anchor" <?php if (!$expense->isUpdatable()) echo 'disabled="disabled" title="'.$this->translate('The expense has been recorded and cannot been updated', 'ppit-accounting', $context->getLocale()).'"'; else echo 'title="'.$this->translate('Delete', 'ppit-core', $context->getLocale()).'"'; ?>>
 			<span class="glyphicon glyphicon-edit"></span>
 		</button>
 
-		<button type="button" class="btn btn-default action-btn" id="expense-delete-anchor" title="<?php echo $this->translate('Delete', 'ppit-core', $context->getLocale()) ?>" <?php if (!$expense->isDeletable()) echo 'disabled="disabled"' ?>>
+		<button type="button" class="btn btn-default action-btn" id="expense-delete-anchor" <?php if (!$expense->isUpdatable() || !$expense->isDeletable()) echo 'disabled="disabled" title="'.$this->translate('The expense has been recorded and cannot been deleted', 'ppit-accounting', $context->getLocale()).'"'; else echo 'title="'.$this->translate('Delete', 'ppit-core', $context->getLocale()).'"'; ?>>
 			<span class="glyphicon glyphicon-trash"></span>
 		</button>
 <?php endif;?>
@@ -89,6 +89,11 @@ if ($expense->id && $action != 'update' || $message == 'OK') $isDisabled = true;
 	    			<option value="<?php echo $key ?>" <?php if ($expense->properties[$propertyId] == $key) echo 'selected="selected"' ?>><?php echo $labels[$context->getLocale()] ?></option>
 		<?php endforeach;?>
 				</select>
+
+	<?php elseif ($property['type'] == 'checkbox') : ?>
+				<div class="col-sm-7">
+					<input type="checkbox" id="<?php echo $propertyId ?>" class="form-control" value="1" <?php if ($expense->non_deductible) echo 'checked="checked"' ?><?php if (isset($isDisabled) && $isDisabled) echo ' disabled ="disabled"' ?>>
+				</div>
 	
 	<?php elseif ($property['type'] == 'dropbox') : ?>
 				<select class="form-control" id="<?php echo $propertyId ?>" <?php if ($isDisabled) echo 'disabled="disabled"'?>>

@@ -298,7 +298,7 @@ function getExpenseUpdate(id, action, target) {
 				$('#expense-delete-anchor').click(function () { getExpenseUpdate(id, 'delete', target); });
 			}
 			else $('#expense-add-anchor').click(function () { getExpenseUpdate(id, 'add', target); });
-			
+
 			connectExpenseUpdateForm(id, action, target);
 			
 <?php if (!$config['ppitCoreSettings']['isTraceActive']) : ?>

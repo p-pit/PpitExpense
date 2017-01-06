@@ -103,6 +103,18 @@ return array(
 		        								),
 		        						),
 		        				),
+		        				'register' => array(
+		        						'type' => 'segment',
+		        						'options' => array(
+		        								'route' => '/register[/:id][/:act]',
+		        								'constraints' => array(
+		        										'id'     => '[0-9]*',
+		        								),
+		        								'defaults' => array(
+		        										'action' => 'register',
+		        								),
+		        						),
+		        				),
 	       		),
 			),
 		),
@@ -122,7 +134,7 @@ return array(
 				array('route' => 'expense/add', 'roles' => array('user')),
 				array('route' => 'expense/mileage', 'roles' => array('user')),
 				array('route' => 'expense/update', 'roles' => array('user')),
-				array('route' => 'expense/delete', 'roles' => array('user')),
+				array('route' => 'expense/register', 'roles' => array('user')),
 				array('route' => 'expense/export', 'roles' => array('accountant')),
 			)
 		)
@@ -218,7 +230,7 @@ return array(
 							'modalities' => array(
 									'new' => array('fr_FR' => 'Nouveau', 'en_US' => 'New'),
 									'approved' => array('fr_FR' => 'Validé', 'en_US' => 'Approved'),
-									'registered' => array('fr_FR' => 'Comptabilisé', 'en_US' => 'Registered'),
+									'recorded' => array('fr_FR' => 'Comptabilisé', 'en_US' => 'Recorded'),
 							),
 							'labels' => array(
 									'en_US' => 'Status',
@@ -264,6 +276,20 @@ return array(
 									'fr_FR' => 'Categorie',
 							),
 					),
+					'caption' => array(
+							'type' => 'input',
+							'labels' => array(
+									'en_US' => 'Caption',
+									'fr_FR' => 'Libellé',
+							),
+					),
+					'justification' => array(
+							'type' => 'input',
+							'labels' => array(
+									'en_US' => 'Identifier',
+									'fr_FR' => 'Référence',
+							),
+					),
 					'tax_inclusive' => array(
 							'type' => 'number',
 							'minValue' => 0,
@@ -289,6 +315,13 @@ return array(
 							'labels' => array(
 									'en_US' => 'Capped amount',
 									'fr_FR' => 'Montant plafonné',
+							),
+					),
+					'non_deductible' => array(
+							'type' => 'checkbox',
+							'labels' => array(
+									'en_US' => 'Non deductible tax',
+									'fr_FR' => 'TVA non déductible',
 							),
 					),
 					'document' => array(
@@ -324,16 +357,22 @@ return array(
 			'displayAudit' => true,
 	),
 	'expense/update' => array(
-			'status' => array('mandatory' => true),
 			'expense_date' => array('mandatory' => false),
 			'approval_date' => array('mandatory' => false),
 			'registration_date' => array('mandatory' => false),
 			'category' => array('mandatory' => true),
+			'caption' => array('mandatory' => true),
+			'justification' => array('mandatory' => false),
 			'tax_inclusive' => array('mandatory' => true),
 			'tax_amount' => array('mandatory' => false),
+			'non_deductible' => array('mandatory' => false),
 			'document' => array('mandatory' => false),
 	),
-
+	
+	'expense/register' => array(
+			'title' => array('en_US' => 'Register an expense', 'fr_FR' => 'Enregistrer une dépense'),
+	),
+		
 	'demo' => array(
 			'expense/search/title' => array(
 					'en_US' => '

@@ -1,7 +1,9 @@
 <?php
 namespace PpitExpense\Model;
 
+use PpitAccounting\Model\Journal;
 use PpitCore\Model\Context;
+use PpitCore\Model\Generic;
 use PpitExpense\Model\MileageScale;
 use Zend\db\sql\Where;
 use Zend\InputFilter\Factory as InputFactory;
@@ -21,6 +23,7 @@ class ReportRow implements InputFilterAwareInterface
     public $registration_date;
     public $status;
     public $category;
+    public $caption;
     public $destination;
     public $justification;
     public $horsepower;
@@ -29,6 +32,7 @@ class ReportRow implements InputFilterAwareInterface
     public $tax_inclusive;
     public $tax_amount;
     public $capped_amount;
+    public $non_deductible;
     public $audit;
     public $update_time;
     
@@ -62,6 +66,7 @@ class ReportRow implements InputFilterAwareInterface
         $this->registration_date = (isset($data['registration_date'])) ? $data['registration_date'] : null;
         $this->status = (isset($data['status'])) ? $data['status'] : null;
         $this->category = (isset($data['category'])) ? $data['category'] : null;
+        $this->caption = (isset($data['caption'])) ? $data['caption'] : null;
         $this->destination = (isset($data['destination'])) ? $data['destination'] : null;
         $this->justification = (isset($data['justification'])) ? $data['justification'] : null;
         $this->horsepower = (isset($data['horsepower'])) ? $data['horsepower'] : null;
@@ -70,6 +75,7 @@ class ReportRow implements InputFilterAwareInterface
         $this->tax_inclusive = (isset($data['tax_inclusive'])) ? $data['tax_inclusive'] : null;
         $this->tax_amount = (isset($data['tax_amount'])) ? $data['tax_amount'] : null;
         $this->capped_amount = (isset($data['capped_amount'])) ? $data['capped_amount'] : null;
+        $this->non_deductible = (isset($data['non_deductible'])) ? $data['non_deductible'] : null;
         $this->audit = (isset($data['audit'])) ? json_decode($data['audit'], true) : null;
     }
 
@@ -86,6 +92,7 @@ class ReportRow implements InputFilterAwareInterface
     	$data['registration_date'] = ($this->registration_date) ? $this->registration_date : null;
     	$data['status'] = $this->status;
     	$data['category'] = $this->category;
+    	$data['caption'] = $this->caption;
     	$data['destination'] = $this->destination;
     	$data['justification'] = $this->justification;
     	$data['horsepower'] = $this->horsepower;
@@ -94,6 +101,7 @@ class ReportRow implements InputFilterAwareInterface
     	$data['tax_inclusive'] = $this->tax_inclusive;
     	$data['tax_amount'] = $this->tax_amount;
     	$data['capped_amount'] = $this->capped_amount;
+    	$data['non_deductible'] = $this->non_deductible;
     	$data['audit'] = json_encode($this->audit);
     	$data['update_time'] = $this->update_time;
     	return $data;
@@ -125,6 +133,7 @@ class ReportRow implements InputFilterAwareInterface
     	$expenses = array();
     
     	foreach ($cursor as $expense) {
+    		if (!$expense->isUpdatable()) $expense->status = 'recorded';
     		$expense->properties = $expense->toArray('flat');
     		$expenses[] = $expense;
     	}
@@ -143,6 +152,7 @@ class ReportRow implements InputFilterAwareInterface
     {
     	$expense = new ReportRow;
     	$expense->status = 'new';
+    	$expense->non_deductible = 1;
     	$expense->audit = array();
     	return $expense;
     }
@@ -174,7 +184,11 @@ class ReportRow implements InputFilterAwareInterface
     		$this->category = trim(strip_tags($data['category']));
     		if (!$this->category || strlen($this->category) > 255) return 'Integrity';
     	}
-        if (array_key_exists('destination', $data)) {
+        if (array_key_exists('caption', $data)) {
+    		$this->caption = trim(strip_tags($data['caption']));
+    		if (strlen($this->caption) > 255) return 'Integrity';
+    	}
+    	if (array_key_exists('destination', $data)) {
     		$this->destination = trim(strip_tags($data['destination']));
     		if (strlen($this->destination) > 255) return 'Integrity';
     	}
@@ -194,6 +208,7 @@ class ReportRow implements InputFilterAwareInterface
         if (array_key_exists('tax_inclusive', $data)) $this->tax_inclusive = (float) $data['tax_inclusive'];
         if (array_key_exists('tax_amount', $data)) $this->tax_amount = (float) $data['tax_amount'];
         if (array_key_exists('capped_amount', $data)) $this->capped_amount = (float) $data['capped_amount'];
+        if (array_key_exists('non_deductible', $data)) $this->non_deductible = (int) $data['non_deductible'];
         if (array_key_exists('update_time', $data)) $this->update_time = $data['update_time'];
     	$this->properties = $this->toArray();
     
@@ -292,6 +307,39 @@ class ReportRow implements InputFilterAwareInterface
     			$this->expense_date = date('Y-m-d');
     }
     
+    public function register($update_time)
+    {
+    	$context = Context::getCurrent();
+    	$accountingChart = $context->getConfig('journal')['accountingChart']['expense/'.$this->category];
+
+    	$journalEntry = Journal::instanciate();
+    	$data = array();
+		$data['operation_date'] = $this->expense_date;
+		$data['reference'] = $this->justification;
+		$data['caption'] = $this->caption;
+		$data['expense_id'] = $this->id;
+		$data['proof_url'] = $this->document;
+		$data['rows'] = array();
+		foreach ($accountingChart as $account => $rule) {
+			if ($rule['source'] == 'excluding_tax') $amount = $this->tax_inclusive - $this->tax_amount;
+			else $amount = $this->properties[$rule['source']];
+			$row = array();
+			if ($this->non_deductible && $rule['source'] == 'tax_amount') {
+				foreach ($accountingChart as $account2 => $rule2) {
+					if ($rule2['source'] == 'excluding_tax') $row['account'] = $account2;
+					break;
+				}
+			}
+			else $row['account'] = $account;
+			$row['direction'] = $rule['direction'];
+			$row['amount'] = $amount;
+			$data['rows'][] = $row;
+		}
+		$journalEntry->loadData($data);
+		if ($this->id) Journal::getTable()->multipleDelete(array('expense_id' => $this->id));
+		$journalEntry->add();
+    }
+    
     public function add()
     {
     	$context = Context::getCurrent();
@@ -309,6 +357,14 @@ class ReportRow implements InputFilterAwareInterface
     	if ($update_time && $expense->update_time > $update_time) return 'Isolation';
     	ReportRow::getTable()->save($this);
     	return 'OK';
+    }
+
+    public function isUpdatable()
+    {
+		$select = Journal::getTable()->getSelect()->where(array('expense_id' => $this->id, 'status' => 'registered'));
+		$cursor = Journal::getTable()->selectWith($select);
+		if (count($cursor) > 0) return false;
+    	return true;
     }
     
     public function isDeletable()

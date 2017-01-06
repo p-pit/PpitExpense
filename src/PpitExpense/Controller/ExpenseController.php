@@ -187,10 +187,26 @@ class ExpenseController extends AbstractActionController
 	    		$connection = ReportRow::getTable()->getAdapter()->getDriver()->getConnection();
 	    		$connection->beginTransaction();
 	    		try {
-	    			if (!$expense->id) $rc = $expense->add();
-	    			elseif ($action == 'delete') $rc = $expense->delete($request->getPost('update_time'));
-	    			else $rc = $expense->update($request->getPost('expense_update_time'));
-    				if ($rc != 'OK') $error = $rc;
+	    			if (!$expense->id) {
+	    				$rc = $expense->add();
+    					if ($rc != 'OK') $error = $rc;
+    					else {
+		    				$rc = $expense->register($request->getPost('expense_update_time'));
+    						if ($rc != 'OK') $error = $rc;
+    					}
+	    			}
+	    			elseif ($action == 'delete') {
+	    				$rc = $expense->delete($request->getPost('update_time'));
+	    			    if ($rc != 'OK') $error = $rc;
+	    			}
+	    			else {
+	    				$rc = $expense->update($request->getPost('expense_update_time'));
+	    			    if ($rc != 'OK') $error = $rc;
+    					else {
+		    				$rc = $expense->register($request->getPost('expense_update_time'));
+    						if ($rc != 'OK') $error = $rc;
+    					}
+	    			}
 	    			if ($error) $connection->rollback();
 	    			else {
 	    				$connection->commit();
@@ -213,6 +229,59 @@ class ExpenseController extends AbstractActionController
     			'expense' => $expense,
 	    		'dropbox' => $dropbox,
 	    		'documentList' => $documentList,
+    			'csrfForm' => $csrfForm,
+    			'error' => $error,
+    			'message' => $message
+    	));
+    	$view->setTerminal(true);
+    	return $view;
+    }
+
+    public function registerAction()
+    {
+    	// Retrieve the context
+    	$context = Context::getCurrent();
+
+    	$id = (int) $this->params()->fromRoute('id', 0);
+    	$expense = ReportRow::get($id);
+    	 
+    	// Instanciate the csrf form
+    	$csrfForm = new CsrfForm();
+    	$csrfForm->addCsrfElement('csrf');
+    	$error = null;
+    	$message = null;
+    	$request = $this->getRequest();
+    	if ($request->isPost()) {
+    		$csrfForm->setInputFilter((new Csrf('csrf'))->getInputFilter());
+    		$csrfForm->setData($request->getPost());
+    		 
+    		if ($csrfForm->isValid()) { // CSRF check
+
+	    		// Atomically save
+	    		$connection = ReportRow::getTable()->getAdapter()->getDriver()->getConnection();
+	    		$connection->beginTransaction();
+	    		try {
+	    			$rc = $expense->register($request->getPost('expense_update_time'));
+    				if ($rc != 'OK') $error = $rc;
+	    			if ($error) $connection->rollback();
+	    			else {
+	    				$connection->commit();
+	    				$message = 'OK';
+	    			}
+	    		}
+	    		catch (\Exception $e) {
+	    			$connection->rollback();
+	    			throw $e;
+	    		}
+	    		$action = null;
+    		}
+    	}
+    
+    	$view = new ViewModel(array(
+    			'context' => $context,
+    			'config' => $context->getconfig(),
+    			'id' => $id,
+    			'expense' => $expense,
     			'csrfForm' => $csrfForm,
     			'error' => $error,
     			'message' => $message
