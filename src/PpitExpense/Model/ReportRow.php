@@ -310,7 +310,7 @@ class ReportRow implements InputFilterAwareInterface
     public function register($update_time)
     {
     	$context = Context::getCurrent();
-    	$accountingChart = $context->getConfig('journal')['accountingChart']['expense/'.$this->category];
+    	$accountingChart = $context->getConfig('journal/accountingChart/expense')[$this->category];
 
     	$journalEntry = Journal::instanciate();
     	$data = array();
@@ -323,17 +323,19 @@ class ReportRow implements InputFilterAwareInterface
 		foreach ($accountingChart as $account => $rule) {
 			if ($rule['source'] == 'excluding_tax') $amount = $this->tax_inclusive - $this->tax_amount;
 			else $amount = $this->properties[$rule['source']];
-			$row = array();
-			if ($this->non_deductible && $rule['source'] == 'tax_amount') {
-				foreach ($accountingChart as $account2 => $rule2) {
-					if ($rule2['source'] == 'excluding_tax') $row['account'] = $account2;
-					break;
+			if ($amount > 0) {
+				$row = array();
+				if ($this->non_deductible && $rule['source'] == 'tax_amount') {
+					foreach ($accountingChart as $account2 => $rule2) {
+						if ($rule2['source'] == 'excluding_tax') $row['account'] = $account2;
+						break;
+					}
 				}
+				else $row['account'] = $account;
+				$row['direction'] = $rule['direction'];
+				$row['amount'] = $amount;
+				$data['rows'][] = $row;
 			}
-			else $row['account'] = $account;
-			$row['direction'] = $rule['direction'];
-			$row['amount'] = $amount;
-			$data['rows'][] = $row;
 		}
 		$journalEntry->loadData($data);
 		if ($this->id) Journal::getTable()->multipleDelete(array('expense_id' => $this->id));
@@ -379,6 +381,7 @@ class ReportRow implements InputFilterAwareInterface
     
     	// Isolation check
     	if ($update_time && $expense->update_time > $update_time) return 'Isolation';
+    	if ($this->id) Journal::getTable()->multipleDelete(array('expense_id' => $this->id));
     	$this->status = 'deleted';
     	ReportRow::getTable()->save($this);
     
