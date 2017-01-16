@@ -251,7 +251,7 @@ class ReportRowController_old extends AbstractActionController
 		    			$addressee->email,
 		    			sprintf($translator->translate($emailTexts['Expense report submitted']['text'], 'ppit-expense', $context->getLocale()),
 		    						$context->getUsername(),
-		    						$coreSettings['domainName'].$url('ppitUser/login').'?redirect=approbation'),
+		    						$coreSettings['domainName'].$url('user/login').'?redirect=approbation'),
 		    			$translator->translate($emailTexts['Expense report submitted']['title'], 'ppit-expense', $context->getLocale()));
 	    		}
     		}
@@ -391,7 +391,7 @@ class ReportRowController_old extends AbstractActionController
 			    			$addressee->email,
 			    			sprintf($translator->translate($emailTexts['Expense report submitted']['text'], 'ppit-expense', $context->getLocale()),
 			    						$context->getUsername(),
-			    						$context->getConfig()['ppitCoreSettings']['domainName'].$url('ppitUser/login').'?redirect=approbation'),
+			    						$context->getConfig()['ppitCoreSettings']['domainName'].$url('user/login').'?redirect=approbation'),
 			    			$translator->translate($emailTexts['Expense report submitted']['title'], 'ppit-expense', $context->getLocale()));
 		    		}
 		    		
