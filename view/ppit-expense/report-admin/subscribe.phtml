@@ -35,7 +35,7 @@
 <?php endif;?>
 <?php if ($error == 'Duplicate user') : ?>
 				    <div class="form-group">
-						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('A user with the same identifier already exists, please choose another one', 'ppit-user', $context->getLocale()) ?></p></div>
+						<div class="col-sm-12"><p class="help-block"><?php echo $this->translate('This identifier has already been chosen, please select another one', 'ppit-core', $context->getLocale()) ?></p></div>
 					</div>
 <?php endif;?>
 <p>Ayez un accès immédiat à <em>P-PIT Notes de frais</em> en saisissant ces quelques champs et en soumettant ce formulaire.</p>
@@ -210,7 +210,7 @@ function checkForm()
 	
 	// User name
 	if (document.getElementById("username").value == "") {
-		renderElement("username", "<?php echo $this->translate('Please input an identifier', 'ppit-user', $context->getLocale()) ?>");
+		renderElement("username", "<?php echo $this->translate('Please input a value', 'ppit-core', $context->getLocale()) ?>");
 		validity = false;
 	}
     else if (document.getElementById("username").value.length > 255) {

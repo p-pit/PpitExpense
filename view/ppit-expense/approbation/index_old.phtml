@@ -29,7 +29,7 @@
 <!--  Approver -->
 <?php if ($currentUser->role_id == 'approver') : ?>
 					<tr>
-						<td align="right"><strong><?php echo $this->translate('Approver', 'ppit-user', $currentUser->locale) ?></strong></td>
+						<td align="right"><strong><?php echo $this->translate('Approver', 'ppit-accounting', $currentUser->locale) ?></strong></td>
 						<td><?php echo $header['approver'] ?></td>
 					</tr>
 					<!--  <tr>
@@ -40,7 +40,7 @@
 <!--  Accountant -->
 <?php else : ?>
 					<tr>
-						<td align="right"><strong><?php echo $this->translate('Accountant', 'ppit-user', $currentUser->locale) ?></strong></td>
+						<td align="right"><strong><?php echo $this->translate('Accountant', 'ppit-accounting', $currentUser->locale) ?></strong></td>
 						<td><?php echo $header['approver'] ?></td>
 					</tr>
 					<tr>
