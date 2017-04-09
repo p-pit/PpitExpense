@@ -33,6 +33,7 @@ class ReportRow implements InputFilterAwareInterface
     public $tax_amount;
     public $capped_amount;
     public $non_deductible;
+	public $bank_journal_reference;
     public $audit;
     public $update_time;
     
@@ -40,7 +41,9 @@ class ReportRow implements InputFilterAwareInterface
 	public $horsepowers;
 	public $mileageScales;
 	public $properties;
-
+	public $availableBankJournalEntries;
+	public $bank_journal_entry;
+	
     // Static fields
     public static $periodCaptions = array(
     	'01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr', '05' => 'May', '06' => 'Jun', '07' => 'Jul', '08' => 'Aug', '09' => 'Sept', '10' => 'Oct', '11' => 'Nov', '12' => 'Dec'	
@@ -76,6 +79,7 @@ class ReportRow implements InputFilterAwareInterface
         $this->tax_amount = (isset($data['tax_amount'])) ? $data['tax_amount'] : null;
         $this->capped_amount = (isset($data['capped_amount'])) ? $data['capped_amount'] : null;
         $this->non_deductible = (isset($data['non_deductible'])) ? $data['non_deductible'] : null;
+        $this->bank_journal_reference = (isset($data['bank_journal_reference'])) ? $data['bank_journal_reference'] : null;
         $this->audit = (isset($data['audit'])) ? json_decode($data['audit'], true) : null;
     }
 
@@ -102,6 +106,7 @@ class ReportRow implements InputFilterAwareInterface
     	$data['tax_amount'] = $this->tax_amount;
     	$data['capped_amount'] = $this->capped_amount;
     	$data['non_deductible'] = $this->non_deductible;
+    	$data['bank_journal_reference'] = (int) $this->bank_journal_reference;
     	$data['audit'] = json_encode($this->audit);
     	$data['update_time'] = $this->update_time;
     	return $data;
@@ -209,6 +214,7 @@ class ReportRow implements InputFilterAwareInterface
         if (array_key_exists('tax_amount', $data)) $this->tax_amount = (float) $data['tax_amount'];
         if (array_key_exists('capped_amount', $data)) $this->capped_amount = (float) $data['capped_amount'];
         if (array_key_exists('non_deductible', $data)) $this->non_deductible = (int) $data['non_deductible'];
+        if (array_key_exists('bank_journal_reference', $data)) $this->bank_journal_reference = (int) $data['bank_journal_reference'];
         if (array_key_exists('update_time', $data)) $this->update_time = $data['update_time'];
     	$this->properties = $this->toArray();
     
@@ -317,6 +323,7 @@ class ReportRow implements InputFilterAwareInterface
 		$data['operation_date'] = $this->expense_date;
 		$data['reference'] = $this->justification;
 		$data['caption'] = $this->caption;
+		$data['bank_journal_reference'] = $this->bank_journal_reference;
 		$data['expense_id'] = $this->id;
 		$data['proof_url'] = $this->document;
 		$data['rows'] = array();

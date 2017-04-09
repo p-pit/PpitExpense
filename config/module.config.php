@@ -209,18 +209,6 @@ return array(
 	        ),
 		),
 	),
-
-	'ppitRoles' => array(
-			'PpitExpense' => array(
-					'approver' => array(
-							'show' => true,
-							'labels' => array(
-									'en_US' => 'Approver',
-									'fr_FR' => 'Valideur',
-							),
-					),
-			),
-	),
 	
 	'expense' => array(
 			'statuses' => array(),
@@ -363,6 +351,7 @@ return array(
 			'category' => array('mandatory' => true),
 			'caption' => array('mandatory' => true),
 			'justification' => array('mandatory' => false),
+			'bank_journal_reference' => array('mandatory' => false),
 			'tax_inclusive' => array('mandatory' => true),
 			'tax_amount' => array('mandatory' => false),
 			'non_deductible' => array('mandatory' => false),

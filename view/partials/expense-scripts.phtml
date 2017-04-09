@@ -196,9 +196,12 @@ function connectAuditPanel()
 $properties = array();
 
 foreach ($context->getConfig('expense/update') as $propertyId => $options) {
-	$property = $context->getConfig('expense')['properties'][$propertyId];
-	if ($property['type'] == 'number') $properties[$propertyId] = array('type' => $property['type'], 'mandatory' => $options['mandatory'], 'minValue' => $property['minValue'], 'maxValue' => $property['maxValue']);
-	else $properties[$propertyId] = array('type' => $property['type'], 'mandatory' => $options['mandatory'], 'maxSize' => ($property['type'] == 'textarea') ? 2047 : 255);
+	if ($propertyId == 'bank_journal_reference') $properties[$propertyId] = array('type' => 'select', 'mandatory' => false);
+	else {
+		$property = $context->getConfig('expense')['properties'][$propertyId];
+		if ($property['type'] == 'number') $properties[$propertyId] = array('type' => $property['type'], 'mandatory' => $options['mandatory'], 'minValue' => $property['minValue'], 'maxValue' => $property['maxValue']);
+		else $properties[$propertyId] = array('type' => $property['type'], 'mandatory' => $options['mandatory'], 'maxSize' => ($property['type'] == 'textarea') ? 2047 : 255);
+	}
 }
 
 $properties['expense_update_time'] = array('type' => 'hidden');

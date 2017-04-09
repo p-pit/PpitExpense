@@ -2,6 +2,7 @@
 
 namespace PpitExpense\Controller;
 
+use PpitAccounting\Model\Journal;
 use PpitExpense\Model\ReportRow;
 use PpitExpense\ViewHelper\SsmlExpenseViewHelper;
 use PpitCore\Model\Csrf;
@@ -145,6 +146,9 @@ class ExpenseController extends AbstractActionController
     	$id = (int) $this->params()->fromRoute('id', 0);
     	if ($id) $expense = ReportRow::get($id);
     	else $expense = ReportRow::instanciate();
+    	$expense->availableBankJournalEntries = Journal::getAvailableBankJournalEntries();
+    	if ($expense->bank_journal_reference) $expense->availableBankJournalEntries[] = Journal::get($expense->bank_journal_reference);
+
     	$action = $this->params()->fromRoute('act', null);
 
     	$documentList = array();
@@ -180,7 +184,6 @@ class ExpenseController extends AbstractActionController
 		    	foreach($context->getConfig('expense/update') as $propertyId => $unused) {
 		    		$data[$propertyId] = $request->getPost(($propertyId));
 		    	}
-
 				if ($expense->loadData($data) != 'OK') throw new \Exception('View error');
 
 	    		// Atomically save
