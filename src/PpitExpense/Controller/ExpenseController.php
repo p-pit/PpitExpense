@@ -7,6 +7,7 @@ use PpitExpense\Model\ReportRow;
 use PpitExpense\ViewHelper\SsmlExpenseViewHelper;
 use PpitCore\Model\Csrf;
 use PpitCore\Model\Context;
+use PpitCore\Model\Place;
 use PpitCore\Form\CsrfForm;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
@@ -17,6 +18,7 @@ class ExpenseController extends AbstractActionController
     {
     	$context = Context::getCurrent();
 		if (!$context->isAuthenticated()) $this->redirect()->toRoute('home');
+		$place = Place::get($context->getPlaceId());
 
 		$applicationId = 'p-pit-finance';
 		$applicationName = 'P-Pit Finance';
@@ -25,6 +27,7 @@ class ExpenseController extends AbstractActionController
     	return new ViewModel(array(
     			'context' => $context,
     			'config' => $context->getConfig(),
+    			'place' => $place,
     			'active' => 'application',
     			'applicationId' => $applicationId,
     			'applicationName' => $applicationName,

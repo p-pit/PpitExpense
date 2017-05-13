@@ -102,7 +102,7 @@ class ReportRowController_old extends AbstractActionController
 	    				$nonFiles,
 	    				$files
 	    		);
-				if ($files['name']['size'] > $context->getConfig()['ppitCoreSettings']['maxUploadSize']) $error = 'Size';
+				if ($files['name']['size'] > $context->getConfig()['maxUploadSize']) $error = 'Size';
     			else {
     				$name = $files['name']['name'];
     				$extension = substr($name, strpos($name, '.')+1);

@@ -20,7 +20,7 @@ echo $this->partial('/partials/header');
 <!--  Error -->
 <?php if ($error == 'Size') : ?>
 					<div class="form-group">
-						<div class="col-sm-12"><p class="help-block"><?php echo sprintf($this->translate('The file should not have a size greater than %s Kb', 'ppit-core', $context->getLocale()), $config['ppitCoreSettings']['maxUploadSize']/1000) ?></p></div>
+						<div class="col-sm-12"><p class="help-block"><?php echo sprintf($this->translate('The file should not have a size greater than %s Kb', 'ppit-core', $context->getLocale()), $config['maxUploadSize']/1000) ?></p></div>
 					</div>
 <?php endif;?>
 
