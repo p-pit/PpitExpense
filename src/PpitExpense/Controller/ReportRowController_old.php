@@ -3,7 +3,7 @@ namespace PpitExpense\Controller;
 
 use PpitCore\Model\Csrf;
 use PpitCore\Model\Context;
-use PpitDocument\Model\Document;
+use PpitCore\Model\Document;
 use PpitCore\Form\CsrfForm;
 use PpitExpense\Model\MileageScale;
 use PpitExpense\Model\ReportRow;
