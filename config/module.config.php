@@ -10,28 +10,6 @@ return array(
 
 	'router' => array(
 		'routes' => array(
-			'index' => array(
-				'type' => 'literal',
-				'options' => array(
-					'route'    => '/',
-					'defaults' => array(
-						'controller' => 'PpitExpense\Controller\Expense',
-						'action'     => 'index',
-					),
-				),
-				'may_terminate' => true,
-				'child_routes' => array(
-					'index' => array(
-						'type' => 'segment',
-						'options' => array(
-							'route' => '/index',
-							'defaults' => array(
-								'action' => 'index',
-							),
-						),
-					),
-				),
-			),
         	'expense' => array(
                 'type'    => 'literal',
                 'options' => array(
